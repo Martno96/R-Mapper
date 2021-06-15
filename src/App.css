@@ -2,6 +2,17 @@
   text-align: center;
 }
 
+:root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  background-color: #61dafb;
+  border: 2px solid black;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
