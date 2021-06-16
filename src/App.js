@@ -18,6 +18,7 @@ import cast from "./reducers/cast"
 //[_] Rename
 //[_] Delete
 //-------------------------
+//[_] Add Bonds by dragging Element onto another (https://resources.jointjs.com/tutorial/connecting-by-dropping)
 //[X][X] MVP selects
 //[postponed] add details via tooltip on hover
 //[postponed] Use textbox when adding a bond, then have a little warning text that says "this name isn't recognized as a created character"

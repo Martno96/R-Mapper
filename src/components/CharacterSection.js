@@ -15,7 +15,7 @@ const CharacterSection = ({ onClick, text }) => {
       <AddCharacterButton />
       <AddBondButton />
       {characters.map((character) => {
-      return <Character character={character}/>
+      return <Character key={character.name} character={character}/>
       })}
     </section>
   )

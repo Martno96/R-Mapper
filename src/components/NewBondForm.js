@@ -35,15 +35,15 @@ export const NewBondForm = ({ open, handleClose }) => {
   const characters = useSelector(store => store.cast.characters)
   const characterNames = useSelector(store => store.cast.characters).map(character => character.name)
   // const [open, setOpen] = useState(false)
-  const [sourceId, setSourceId] = useState("")
-  const [targetId, setTargetId] = useState("")
+  const [source, setSource] = useState("")
+  const [target, setTarget] = useState("")
   const [subtype, setSubtype] = useState("")
   const [category, setCategory] = useState("")
   const [timeStart, setTimeStart] = useState("")
   const [timeEnd, setTimeEnd] = useState("")
   const [details, setDetails] = useState("")
-  // const [sourceId, setSourceId] = useState({ id:"", value:""})
-  // const [targetId, setTargetId] = useState({ id:"", value:""})
+  // const [source, setSource,] = useState({ id:"", value:""})
+  // const [target, setTarget] = useState({ id:"", value:""})
   // const [subtype, setSubtype] = useState({ id:"", value:""})
   // const [category, setCategory] = useState({ id:"", value:""})
   // const [timeStart, setTimeStart] = useState({ id:"", value:""})
@@ -57,12 +57,12 @@ export const NewBondForm = ({ open, handleClose }) => {
   //   setOpen(true);
   // };
 
-  const handleSourceIdChange = (event) => {
-    setSourceId(event.target.value)
+  const handleSourceChange = (event) => {
+    setSource(event.target.value)
   }
 
-  const handleTargetIdChange = (event) => {
-    setTargetId(event.target.value)
+  const handleTargetChange = (event) => {
+    setTarget(event.target.value)
   }
 
   const handleCategoryChange = (event) => {
@@ -83,9 +83,9 @@ export const NewBondForm = ({ open, handleClose }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    dispatch(cast.actions.addBond({sourceId, targetId, details, subtype, category}))
-    setSourceId("")
-    setTargetId("")
+    dispatch(cast.actions.addBond({source, target, details, subtype, category}))
+    setSource("")
+    setTarget("")
     setDetails("")
     setSubtype("")
     setCategory("")
@@ -113,7 +113,7 @@ export const NewBondForm = ({ open, handleClose }) => {
               >
                 <option aria-label="None" value=""></option>
                 {bondCategories.map((category) => {
-                  return <option value={category.name}>{category.name}</option>
+                  return <option key={category.name} value={category.name}>{category.name}</option>
                 })}
                 
               </NativeSelect>
@@ -124,8 +124,8 @@ export const NewBondForm = ({ open, handleClose }) => {
               <InputLabel htmlFor="character-a">Owner</InputLabel>
               <NativeSelect
                 required
-                value={sourceId}
-                onChange={handleSourceIdChange}
+                value={source}
+                onChange={handleSourceChange}
                 inputProps={{
                   name: 'character-a',
                   id: 'character-a',
@@ -133,7 +133,7 @@ export const NewBondForm = ({ open, handleClose }) => {
               >
                 <option aria-label="None" value=""></option>
                 {characters.map((character) => {
-                  return <option value={character.id}>{character.name}</option>
+                  return <option key={character.name} value={character.name}>{character.name}</option>
                 })}
                 
               </NativeSelect>
@@ -146,8 +146,8 @@ export const NewBondForm = ({ open, handleClose }) => {
               <InputLabel htmlFor="character-b">Target</InputLabel>
               <NativeSelect
                 required
-                value={targetId}
-                onChange={handleTargetIdChange}
+                value={target}
+                onChange={handleTargetChange}
                 inputProps={{
                   name: 'character-b',
                   id: 'character-b',
@@ -155,7 +155,7 @@ export const NewBondForm = ({ open, handleClose }) => {
               >
                 <option aria-label="None" value=""></option>
                 {characters.map((character) => {
-                  return <option value={character.id}>{character.name}</option>
+                  return <option key={character.name} value={character.name}>{character.name}</option>
                 })}
                 
               </NativeSelect>
@@ -175,26 +175,26 @@ export const NewBondForm = ({ open, handleClose }) => {
                 onChange={handleDetailsChange}
               />
             </FormControl>
-          {/* <CharacterNameAutoComplete label="who has the relation...?" value={sourceId} onChange={handleSourceIdChange}/>
+          {/* <CharacterNameAutoComplete label="who has the relation...?" value={source} onChange={handleSourceChange}/>
 
-          <CharacterNameAutoComplete label="... with who?" value={targetId} onChange={handleTargetIdChange}/> */}
+          <CharacterNameAutoComplete label="... with who?" value={target} onChange={handleTargetChange}/> */}
 
           {/* <TextField
             autoFocus
             margin="dense"
-            id="sourceId"
-            label="sourceId"
+            id="source"
+            label="source"
             fullWidth
-            value={sourceId}
-            onChange={handleSourceIdChange}
+            value={source}
+            onChange={handleSourceChange}
           />
           <TextField
             margin="dense"
-            id="targetId"
+            id="target"
             label="short target"
             fullWidth
-            value={targetId}
-            onChange={handleTargetIdChange}
+            value={target}
+            onChange={handleTargetChange}
           /> */}
 
 

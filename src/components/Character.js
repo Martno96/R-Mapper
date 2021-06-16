@@ -42,8 +42,6 @@ export const Character = ({ character }) => {
     setExpanded(isExpanded ? panel : false);
   }
 
-  console.log(bonds)
-
   const bondsSourceOf = bonds.filter(bond => bond.source === character.id)
   const bondsTargetOf = bonds.filter(bond => bond.target === character.id)
   const relevantBondCategories = [...new Set(bondsSourceOf.concat(bondsTargetOf).map(bond => bond.category))]
