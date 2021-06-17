@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import * as joint from 'jointjs'
 
@@ -6,15 +6,12 @@ import cast from '../reducers/cast'
 // import { bondCategories } from '../constants'
 
 
-const DrawCharacters = () => {
+const Test = () => {
   
   const characters = useSelector(store => store.cast.characters)
   const dispatch = useDispatch()
 
-  useEffect (() => {
-    dispatch(cast.actions.drawCharacters())
-  }, [characters])
-
+  //dispatch(cast.actions.drawTest())
 
   return (
     <div>
@@ -22,4 +19,4 @@ const DrawCharacters = () => {
   )
 }
 
-export default DrawCharacters
+export default Test

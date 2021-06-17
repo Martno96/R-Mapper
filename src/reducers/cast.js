@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { nanoid } from 'nanoid'
 import * as joint from 'jointjs'
 import { shapes, dia } from 'jointjs'
+import * as standard from 'jointjs/src/shapes/standard.mjs'
 
 
 import { bondCategories } from '../constants'
@@ -13,7 +14,7 @@ import { bondCategories } from '../constants'
 //   return graph
 // },
 console.log(joint.shapes)
-let initGraph = new joint.dia.Graph({}, { cellNameSpace: shapes })
+let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 
 let rectio = new joint.shapes.standard.Rectangle()
 rectio.position(150, 50)
@@ -116,7 +117,7 @@ export const cast = createSlice ({
       // console.log(bunny2)
       // console.log(JSON.parse(bunny2))
       // console.log(JSON.parse(store.bunny))
-      let updatedGraph = new joint.dia.Graph({}, { cellNameSpace: joint.shapes }) //init new graph instance
+      let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes }) //init new graph instance
       //console.log(store.graph) //okay store.graph becomes a Proxy when JSON.parse is used in the line below, but NOT when it isnt....
       console.log(JSON.parse(store.graph))
  
@@ -142,7 +143,7 @@ export const cast = createSlice ({
       store.graph = JSON.stringify(updatedGraph.toJSON()) //update store
     },
     drawBonds: (store, action) => {
-      let updatedGraph = new joint.dia.Graph({}, { cellNameSpace: joint.shapes }) //init new graph instance
+      let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes }) //init new graph instance
       updatedGraph.fromJSON(store.graph) //get existing graph from store
       const characterElements = updatedGraph.getElements()
 
@@ -164,6 +165,12 @@ export const cast = createSlice ({
         link.target(targetElement);
         link.addTo(updatedGraph)
       })
+      store.graph = JSON.stringify(updatedGraph.toJSON()) //update store
+    },
+    drawTest: (store, action) => {
+      let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes }) //init new graph instance
+      updatedGraph.fromJSON(store.graph) //get existing graph from store
+      
       store.graph = JSON.stringify(updatedGraph.toJSON()) //update store
     }
   }
