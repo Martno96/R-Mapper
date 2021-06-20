@@ -9,11 +9,12 @@ import cast from '../reducers/cast'
 const DrawCharacters = () => {
   
   const characters = useSelector(store => store.cast.characters)
+  const bonds = useSelector(store => store.cast.bonds)
   const dispatch = useDispatch()
 
   useEffect (() => {
-    dispatch(cast.actions.drawCharacters())
-  }, [characters])
+    dispatch(cast.actions.drawMap())
+  }, [characters, bonds])
 
 
   return (

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as joint from 'jointjs'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { shapes, dia } from 'jointjs'
 import * as standard from 'jointjs/src/shapes/standard.mjs'
 
@@ -10,13 +10,18 @@ import DrawCharacters from './DrawCharacters'
 import DrawBonds from './DrawBonds'
 import Test from './Test'
 
+import cast from '../reducers/cast'
+
 // window.joint = joint
 
 const Container = () => {
 
   let graph = useSelector(store => store.cast.graph)
+  const characters = useSelector(store => store.cast.characters)
+  const bonds = useSelector(store => store.cast.bonds)
+  const dispatch = useDispatch()
+
   let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
-  updatedGraph.fromJSON(JSON.parse(graph))
 
   let paper = new joint.dia.Paper({
     el: document.getElementById('myholder'),
@@ -25,7 +30,40 @@ const Container = () => {
     width: 800,
     height: 500, 
     gridSize: 1
-  })  
+  })
+
+  useEffect (() => {
+    console.log("updatedGraph as JSON:")
+    console.log(updatedGraph.toJSON())
+
+    console.log("updatedGraph as normal:")
+    console.log(updatedGraph)
+    
+    dispatch(cast.actions.drawMap({ model: updatedGraph }))
+  }, [characters, bonds])
+
+  console.log("moved!")
+
+  updatedGraph.fromJSON(JSON.parse(graph))
+  
+  const elementsGotten = updatedGraph.getElements()
+
+  console.log("elementsGotten[0]")
+  console.log(elementsGotten[0])
+
+  console.log("elementsGotten")
+  console.log(elementsGotten)
+
+  // elementsGotten[0].on('change: position', function(element){
+  //   console.log(`${element.id}:${element.id}`)
+  // })
+
+  // console.log("paper model")
+  // console.log(paper.model)
+
+
+  
+  
 
 //   var graph0 = new joint.dia.Graph({}, { cellNamespace: shapes });
 //   graph0.set('graphCustomProperty', true);
@@ -171,8 +209,8 @@ const Container = () => {
 
   return (
     <>
-      <DrawCharacters />
-      <DrawBonds />
+      {/* <DrawCharacters />
+      <DrawBonds /> */}
     </>
   )
 }

@@ -13,29 +13,29 @@ import { bondCategories } from '../constants'
 //   graph.toJSON()
 //   return graph
 // },
-console.log(joint.shapes)
+// console.log(joint.shapes)
 let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 
-let rectio = new joint.shapes.standard.Rectangle()
-rectio.position(150, 50)
-rectio.resize(100, 40)
-rectio.attr({
-  body: {
-    fill: 'green'
-  },
-  label: {
-    text: 'bob',
-    fill: 'white'
-  }
-})
-console.log(rectio)
-rectio.addTo(initGraph)
+// let rectio = new joint.shapes.standard.Rectangle()
+// rectio.position(150, 50)
+// rectio.resize(100, 40)
+// rectio.attr({
+//   body: {
+//     fill: 'green'
+//   },
+//   label: {
+//     text: 'bob',
+//     fill: 'white'
+//   }
+// })
+// // console.log(rectio)
+// rectio.addTo(initGraph)
 
 let jsonGraph = initGraph.toJSON(initGraph)
-console.log(jsonGraph)
-console.log(JSON.stringify(jsonGraph))
-const parsy = JSON.stringify(jsonGraph)
-console.log(JSON.parse(parsy))
+// console.log(jsonGraph)
+// console.log(JSON.stringify(jsonGraph))
+// const parsy = JSON.stringify(jsonGraph)
+// console.log(JSON.parse(parsy))
 
 const initialItems = localStorage.getItem('cast')
 ? JSON.parse(localStorage.getItem('cast'))
@@ -43,23 +43,24 @@ const initialItems = localStorage.getItem('cast')
   graph: JSON.stringify(jsonGraph),
   characters: [
     {
-      id: "T2StgXR6_r4jdHI9B-myV",
+      id: nanoid(),
       name: "Smirgus",
       bio: "sabka jcbskbqkib bdkabsd sabkdbka dbkasbjkdb kdbajsbd"
     },
     {
-      id: "TXstMXY5_B4DDhI9B-myV",
+      id: nanoid(),
       name: "Virp",
       bio: "olbdkabsd sabkdbka sabka jcbskbqkib dbkasbjkdb kdbajsbd"
     },
     {
-      id: "7NstgcR6_81jd1I0x-c0m",
+      id: nanoid(),
       name: "Plonky",
       bio: "sabka dbkasbjkdb jcbskbqkib sabkdbka kdbajsbd bdkabsd "
     }
   ],
   bonds: [
     {
+      id: nanoid(),
       category: "Familial Bonds",
       source: "Plonky",
       subtype: "has kids with",
@@ -97,6 +98,7 @@ export const cast = createSlice ({
         typeof action.payload.details === 'string' && action.payload.details !== ''
       ) {
         store.bonds = [...store.bonds, {
+          id: nanoid(),
           category: action.payload.category,
           source: action.payload.source,
           subtype: action.payload.subtype,
@@ -113,16 +115,12 @@ export const cast = createSlice ({
       }
     },
     drawCharacters: (store, action) => {
-      // const bunny2 = JSON.stringify(store.bunny)
-      // console.log(bunny2)
-      // console.log(JSON.parse(bunny2))
-      // console.log(JSON.parse(store.bunny))
+      console.log("draw character")
       let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes }) //init new graph instance
-      //console.log(store.graph) //okay store.graph becomes a Proxy when JSON.parse is used in the line below, but NOT when it isnt....
-      console.log(JSON.parse(store.graph))
+      // console.log(JSON.parse(store.graph))
  
       updatedGraph.fromJSON(JSON.parse(store.graph)) //get existing graph from store
-      console.log(updatedGraph)
+     // console.log(updatedGraph)
       store.characters.forEach((character, index) => {
         let rect = new joint.shapes.standard.Rectangle();
         rect.position(150+index*10, 50+index*10);
@@ -136,13 +134,14 @@ export const cast = createSlice ({
             fill: 'white'
           }
         });
-        console.log(rect)
+       // console.log(rect)
         rect.addTo(updatedGraph)
-        console.log(`added ${character.name} to graph!`)
+       // console.log(`added ${character.name} to graph!`)
       })
       store.graph = JSON.stringify(updatedGraph.toJSON()) //update store
     },
     drawBonds: (store, action) => {
+      console.log("is running? Uwu")
       let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes }) //init new graph instance
       updatedGraph.fromJSON(store.graph) //get existing graph from store
       const characterElements = updatedGraph.getElements()
@@ -150,8 +149,8 @@ export const cast = createSlice ({
       store.bonds.forEach((bond, index) => {
         const sourceElement = updatedGraph.getElements().find(element => element.attr.label.text === bond.source)
         const targetElement = updatedGraph.getElements().find(element => element.attr.label.text === bond.target)
-        console.log(sourceElement)
-        console.log(targetElement)
+       // console.log(sourceElement)
+       // console.log(targetElement)
         //the issue with this section of code is that I was trying to take a normal object and put it into the graph xD
         // const sourceElement = store.characters.find(character => character.id === bond.source)
         // const targetElement = store.characters.find(character => character.id === bond.target)
@@ -172,9 +171,110 @@ export const cast = createSlice ({
       updatedGraph.fromJSON(store.graph) //get existing graph from store
       
       store.graph = JSON.stringify(updatedGraph.toJSON()) //update store
+    },
+    loadGraph: (store, action) => {
+
+    },
+    saveGraph: (store, action) => {
+
+    },
+    drawMap: (store, action) => {
+      
+      const elementPositionsToRetainV2 = action.payload.model.getElements().map(element => {
+        return element.get('position')
+      })
+
+      console.log("elementPositionsToRetainV2")
+      console.log(elementPositionsToRetainV2)
+
+      console.log("paper model")
+      console.log(action.payload.model.toJSON())
+
+      //NOTE: the goal for this here array SHOULD BE to get the NEW coordinates for each CHARACTER
+      //in the character ARRAY! :D (wait but what about Bonds???? they will have positons too right?)
+      console.log("paper model")
+      console.log(action.payload.model.toJSON())
+      
+      const elementPositionsToRetain = action.payload.model.toJSON().cells.map(cell => {
+        if (cell.type === "standard.Rectangle") {
+          return { type: "character", name: cell.attrs.label.text, position: cell.position }
+        } else if (cell.type === "standard.Ellipse") {
+          return { type: "bond details", position: cell.position }
+        } else {
+          return {}
+        }
+      })
+      console.log("positions to retain array:")
+      console.log(elementPositionsToRetain)
+
+          //ISSUE(?): using the characters array as a forEach below is problematic because
+          //the character array won't map 1-to-1 with the cells array in the graph, since cells 
+          //A) include Links too and B) also may not be in the same order as the characters 
+          //in the characters array
+          //No, wait... if I simply itterate through the characters array and at each character
+          //find the Element in the stored graph with the same label as the character name, then
+          //I can at the same time
+          //Potential fixes:
+          //> itterate using the STORED GRAPH cells array instead, but check if it is an Element or a Link,
+          // then accordingly do what? If it is an Element it must be a character, so
+
+      // let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes }) //init new graph instance
+      // updatedGraph.fromJSON(JSON.parse(store.graph)) //get existing graph from store
+      // updatedGraph.clear()
+      // console.log("Unpacked store graph:")
+      // console.log(updatedGraph)
+
+      //draw Characters
+      store.characters.forEach((character, index) => {
+        let positionX, positionY
+        if (elementPositionsToRetain.find(element => element.name === character.name) !== undefined) {
+          positionX = elementPositionsToRetain.find(element => element.name === character.name).position.x
+          positionY = elementPositionsToRetain.find(element => element.name === character.name).position.y
+        } else {
+          positionX = index*10
+          positionY = index*10
+        }
+        console.log(`x: ${positionX}`)
+        console.log(`y: ${positionY}`)
+
+        let rect = new joint.shapes.standard.Rectangle();
+        rect.position(positionX, positionY); //instead read positions from corresponding graph in payload (model)
+        rect.resize(100, 40);
+        rect.attr({
+          body: {
+            fill: 'green'
+          },
+          label: {
+            text: character.name,
+            fill: 'white'
+          }
+        });
+        rect.addTo(action.payload.model)
+      })
+
+      //draw Bonds
+      store.bonds.forEach((bond, index) => {
+        const sourceElement = action.payload.model.getElements().find(element => element.attributes.attrs.label.text === bond.source)
+        const targetElement = action.payload.model.getElements().find(element => element.attributes.attrs.label.text === bond.target)
+        let link = new joint.shapes.standard.Link();
+        link.source(sourceElement);
+        link.target(targetElement);
+        link.addTo(action.payload.model)
+      })
+      console.log(action.payload.model.toJSON())
+      store.graph = JSON.stringify(action.payload.model.toJSON()) //update store
     }
   }
 })
+
+// console.log("updatedGraph.getElements():")
+// console.log(updatedGraph.getElements())
+// console.log("Bond details:")
+// console.log(bond.details)
+// console.log("Bond sourceElement:")
+// console.log(sourceElement)
+// console.log("Bond targetElement:")
+// console.log(targetElement)
 
 export const saveChanges = (input) => {
   // let isStart = input.type ? false : true
