@@ -14,45 +14,76 @@ import cast from '../reducers/cast'
 
 // window.joint = joint
 
+let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
+
 const Container = () => {
 
   let graph = useSelector(store => store.cast.graph)
   const characters = useSelector(store => store.cast.characters)
   const bonds = useSelector(store => store.cast.bonds)
+  const first = useSelector(store => store.cast.first)
   const dispatch = useDispatch()
 
-  let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
+  console.log("--- Container mounted ---")
 
-  let paper = new joint.dia.Paper({
-    el: document.getElementById('myholder'),
-    model: updatedGraph,
-    cellViewNamespace: joint.shapes,
-    width: 800,
-    height: 500, 
-    gridSize: 1
-  })
+  
+
+  
 
   useEffect (() => {
-    console.log("updatedGraph as JSON:")
-    console.log(updatedGraph.toJSON())
+    // console.log("updatedGraph as JSON:")
+    // console.log(updatedGraph.toJSON())
 
-    console.log("updatedGraph as normal:")
-    console.log(updatedGraph)
+    // console.log("updatedGraph as normal:")
+    // console.log(updatedGraph)
     
     dispatch(cast.actions.drawMap({ model: updatedGraph }))
   }, [characters, bonds])
 
-  console.log("moved!")
+  // console.log("moved!")
 
-  updatedGraph.fromJSON(JSON.parse(graph))
+  
+  
+  if (first < 2) {
+    console.log("--- Updated graph from redux store! ---")
+    
+    let paper = new joint.dia.Paper({
+      el: document.getElementById('myholder'),
+      model: updatedGraph,
+      cellViewNamespace: joint.shapes,
+      width: 800,
+      height: 500, 
+      gridSize: 1
+    })
+
+    // paper.on('element:button:pointerdown', function(elementView, evt) {
+    //   evt.stopPropagation(); // stop any further actions with the element view (e.g. dragging)
+  
+    //   var model = elementView.model;
+  
+    //   if (model.attr('body/visibility') === 'visible') {
+    //     model.attr('body/visibility', 'hidden')
+    //     model.attr('label/visibility', 'hidden')
+    //     model.attr('buttonLabel/text', '<')
+  
+    //   } else {
+    //     model.attr('body/visibility', 'visible')
+    //     model.attr('label/visibility', 'visible')
+    //     model.attr('buttonLabel/text', 'v')
+    //   }
+    // })
+    
+    updatedGraph.fromJSON(JSON.parse(graph))
+    dispatch(cast.actions.clearFirst())
+  }
   
   const elementsGotten = updatedGraph.getElements()
 
-  console.log("elementsGotten[0]")
-  console.log(elementsGotten[0])
+  // console.log("elementsGotten[0]")
+  // console.log(elementsGotten[0])
 
-  console.log("elementsGotten")
-  console.log(elementsGotten)
+  // console.log("elementsGotten")
+  // console.log(elementsGotten)
 
   // elementsGotten[0].on('change: position', function(element){
   //   console.log(`${element.id}:${element.id}`)

@@ -19,7 +19,7 @@ export const AddBondButton = () => {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button variant="contained" color="primary" onClick={handleClickOpen}>
         <Add fontSize="small"/>
         ADD BOND
       </Button>
