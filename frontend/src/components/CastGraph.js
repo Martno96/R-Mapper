@@ -6,7 +6,7 @@ import cast from '../reducers/cast'
 
 let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 
-const Container = () => {
+const CastGraph = () => {
 
   let graph = useSelector(store => store.cast.graph)
   const characters = useSelector(store => store.cast.characters)
@@ -38,4 +38,4 @@ const Container = () => {
   )
 }
 
-export default Container
+export default CastGraph

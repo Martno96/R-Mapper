@@ -43,7 +43,7 @@ const port = process.env.PORT || 8080
 const app = express()
 
 app.use(cors())
-app.use(bodyParser.json())
+app.use(express.json()) //CHANGED TO THIS FROM bodyParser!! IF EVERYTHING BROKEN LOOK HERE FIRST
 
 app.get('/', (req, res) => {
   res.send('Hello world')

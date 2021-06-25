@@ -4,11 +4,16 @@ import React from 'react'
 import * as joint from 'jointjs'
 import { Provider } from 'react-redux'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
-import Container from './components/Container'
+import CastGraph from './components/CastGraph'
 import CharacterSection from './components/CharacterSection'
+import Login from './pages/Login' 
+import CastEditor from './pages/CastEditor'
+import UserCasts from './pages/UserCasts'
 
-import cast from "./reducers/cast"
+import user from './reducers/user'
+import cast from './reducers/cast'
 
 //TO-DO
 //-------- TODAY ----------
@@ -35,55 +40,17 @@ const store = configureStore({ reducer })
 
 function App() {
 
-  // let rect = new joint.shapes.standard.Rectangle();
-  // rect.position(100, 30);
-  // rect.resize(100, 40);
-  // rect.attr({
-  //   body: {
-  //     fill: 'blue'
-  //   },
-  //   label: {
-  //     text: 'Hello',
-  //     fill: 'white'
-  //   }
-  // });
-  // rect.addTo(graph);
-
-  // let rect2 = rect.clone();
-  // rect2.translate(300, 0);
-  // rect2.attr('label/text', 'World!');
-  // rect2.addTo(graph);
-
-  // let link = new joint.shapes.standard.Link();
-  // link.source(rect);
-  // link.target(rect2);
-  // link.addTo(graph);
-
   return (
     <Provider store={store}>
-      <Container />
-      <CharacterSection />
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/" component={Login} />
+          <Route path="/users/:userId/casts" component={UserCasts} />
+          <Route path="/users/:userId/casts/:castId" component={CastEditor} />
+        </Switch>
+      </BrowserRouter>
     </Provider>
   )
-
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <p>
-  //         Edit <code>src/App.js</code> and save to reload.
-  //       </p>
-  //       <a
-  //         className="App-link"
-  //         href="https://reactjs.org"
-  //         target="_blank"
-  //         rel="noopener noreferrer"
-  //       >
-  //         Learn React
-  //       </a>
-  //     </header>
-  //   </div>
-  // );
 }
 
 export default App;
