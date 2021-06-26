@@ -49,8 +49,9 @@ app.get('/', (req, res) => {
   res.send('Hello world')
 })
 
-app.get('/secret', authenticateUser)
-app.get('/secret', async (req, res) => {
+//load user's (for now one and only) cast
+app.get('/users/:username', authenticateUser)
+app.get('/users/:username', async (req, res) => {
   const { message } = req.body;
   try {
     res.json({ success: true, message: "here is the secret message :D" })

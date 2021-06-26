@@ -29,7 +29,8 @@ import cast from './reducers/cast'
 //[postponed] Use textbox when adding a bond, then have a little warning text that says "this name isn't recognized as a created character"
 
 const reducer = combineReducers({ 
-  cast: cast.reducer
+  cast: cast.reducer,
+  user: user.reducer
 })
 
 const store = configureStore({ reducer })

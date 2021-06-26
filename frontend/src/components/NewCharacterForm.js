@@ -36,8 +36,7 @@ export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
   // };
 
   const handleSubmit = () => {
-    const capitalizedName = 
-    setName(name)
+    //const capitalizedName = name.characterAt()
     dispatch(cast.actions.addCharacter({name, bio}))
     setName("")
     setBio("")
