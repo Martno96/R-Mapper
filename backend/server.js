@@ -70,9 +70,10 @@ app.get('/', (req, res) => {
 //load user's (for now one and only) cast
 app.get('/users/:username', authenticateUser)
 app.get('/users/:username', async (req, res) => {
-  const { message } = req.body;
+  const accessToken = req.header('Authorization')
+  const user = await User.findOne({ accessToken })
   try {
-    res.json({ success: true, message: "here is the secret message :D" })
+    res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
   } catch (error) {
     res.status(400).json({ success: false, message: "Invalid Request", error })
   }
@@ -95,6 +96,7 @@ app.post('/signup', async (req, res) => {
         success: true,
         userID: newUser._id,
         username: newUser.username,
+        cast: newUser.casts[0],
         accessToken: newUser.accessToken
       })
     }
@@ -115,6 +117,7 @@ app.post('/signin', async (req, res) => {
         success: true,
         userID: user._id,
         username: user.username,
+        cast: user.casts[0],
         accessToken: user.accessToken
       });
     } else {
@@ -123,7 +126,6 @@ app.post('/signin', async (req, res) => {
   } catch (error) {
     res.status(400).json({ success: false, message: "Invalid request", error })
   }
-
 })
 
 app.listen(port, () => {
