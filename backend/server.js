@@ -89,7 +89,11 @@ app.post('/signup', async (req, res) => {
     }).save()
     if (newUser) {
       //HERE CREATE AN EMPTY GRAPH (MONGOOSE OBJECT), so there is always something to load!!!
-      const newCast = await new Cast ().save()
+      const newCast = await new Cast ({
+        graph: {},
+        characters: [],
+        bonds: []
+      }).save()
       newUser.casts = [newCast._id]
       newUser = await newUser.save()
       res.json({
