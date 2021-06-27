@@ -22,6 +22,24 @@ const User = mongoose.model('User', {
   accessToken: {
     type: String,
     default: () => crypto.randomBytes(128).toString('hex')
+  },
+  casts: {
+    type: Array
+  }
+})
+
+const Cast = mongoose.model('Cast', {
+  graph: {
+    type: Object, 
+    required: true
+  },
+  characters: {
+    type: Array, 
+    required: true
+  },
+  bonds: {
+    type: Array, 
+    required: true
   }
 })
 
@@ -61,20 +79,24 @@ app.get('/users/:username', async (req, res) => {
 })
 
 app.post('/signup', async (req, res) => {
-  const { username, password } = req.body; // We separated username and password from the body
+  const { username, password } = req.body // We separated username and password from the body
   try {
-    const salt = bcrypt.genSaltSync();
+    const salt = bcrypt.genSaltSync()
     const newUser = await new User ({
       username, 
       password: bcrypt.hashSync(password, salt)
-    }).save();
+    }).save()
     if (newUser) {
+      //HERE CREATE AN EMPTY GRAPH (MONGOOSE OBJECT), so there is always something to load!!!
+      const newCast = await new Cast ().save()
+      newUser.casts = [newCast._id]
+      newUser = await newUser.save()
       res.json({
         success: true,
         userID: newUser._id,
         username: newUser.username,
         accessToken: newUser.accessToken
-      });
+      })
     }
   } catch(error) {
     if(error.code===11000){

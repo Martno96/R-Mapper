@@ -6,18 +6,26 @@ import CredentialsForm from '../components/CredentialsForm.js'
 import user from '../reducers/user'
 
 const Login = () => {
+    const username = useSelector(store => store.user.username)
     const accessToken = useSelector(store => store.user.accessToken)
     const history = useHistory()
     const error = useSelector(store => store.user.error)
     
     useEffect(() => {
         if(accessToken) {
-          history.push('/')
+          history.push('/users/:username')
         }
     }, [accessToken, history])
     
     return (
-        <> 
+        <>
+          <h1>R-Mapper</h1>
+          <h2>a handy tool for mapping out the core relationships in your cast of characters</h2>
+
+          <h3>Sign In</h3>
+          <CredentialsForm formFunction='signin'/>
+          <p>or if you are new here:</p>
+          <h3>Sign Up</h3> 
           <CredentialsForm formFunction='signup'/>
           {error !== null && (error.message === 'User not found') && 
             <div>

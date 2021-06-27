@@ -46,8 +46,8 @@ function App() {
       <BrowserRouter>
         <Switch>
           <Route exact path="/" component={Login} />
-          <Route path="/users/:userId/casts" component={UserCasts} />
-          <Route path="/users/:userId/casts/:castId" component={CastEditor} />
+          {/* <Route path="/users/:username" component={UserCasts} /> */}
+          <Route path="/users/:username" component={CastEditor} />
         </Switch>
       </BrowserRouter>
     </Provider>

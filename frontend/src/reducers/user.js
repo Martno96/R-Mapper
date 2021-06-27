@@ -54,11 +54,17 @@ const user = createSlice({
   }
 })
 
-export const authenticate = (username, password, userAction) => {
+export const authenticate = (params) => {
+  const username = params.username
+  const password = params.password
+  const userAction = params.userAction
+  console.log(username)
+  console.log(password)
+  console.log(userAction)
+
   return (dispatch, getState) => {
     const state = getState()
     let options
-
     //action - determines method, but not necessarily target
     switch (userAction) {
       case undefined:
@@ -98,18 +104,11 @@ export const authenticate = (username, password, userAction) => {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          if (userAction !== undefined && userAction === 'secret') {
-            batch(() => {
-              dispatch(user.actions.setSecret(data.message))
-              dispatch(user.actions.setError(null))
-            })
-          } else {
-            batch(() => {
-              dispatch(user.actions.setAccessToken(data.accessToken))
-              dispatch(user.actions.setUsername(data.username))
-              dispatch(user.actions.setError(null))
-            })
-          }
+          batch(() => {
+            dispatch(user.actions.setAccessToken(data.accessToken))
+            dispatch(user.actions.setUsername(data.username))
+            dispatch(user.actions.setError(null))
+          })
         } else {
           dispatch(user.actions.setError(data))
         }

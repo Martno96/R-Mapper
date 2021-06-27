@@ -31,10 +31,23 @@ export const CredentialsForm = ({ formFunction }) => {
 
   const onSubmit = (event) => {
     event.preventDefault()
-    dispatch(authenticate({username, password, formFunction,}))
+    dispatch(authenticate({username, password, userAction: formFunction}))
     setUsername("")
     setPassword("")
-  };
+  }
+
+  let buttonLabel
+  switch(formFunction) {
+    case 'signin':
+      buttonLabel = 'SIGN IN'
+      break
+    case 'signup':
+      buttonLabel = 'SIGN UP'
+      break
+    default:
+      buttonLabel = '???'
+      break
+  }
 
   return (
     <div>
@@ -62,9 +75,10 @@ export const CredentialsForm = ({ formFunction }) => {
           onChange={onPasswordChange}
         />
         <Button variant="contained" type="submit" color="primary" onClick={onSubmit}>
-          SIGN UP
+          {buttonLabel}
         </Button>
       </FormControl>
+      {/* <p>{`DEBUG! formFunction is ${formFunction}`}</p> */}
     </div>
   );
 }
