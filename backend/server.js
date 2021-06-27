@@ -5,8 +5,13 @@ import mongoose from 'mongoose'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
-const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/authAPI"
+const mongoUrl = process.env.MONGO_URL || "mongodb+srv://murt:someBODY@cluster0.l2cvo.mongodb.net/r-mapper?retryWrites=true&w=majority"
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+  // .then(res=> {
+  //   console.log("DB Connected!")
+  // }).catch(err => {
+  // console.log(Error, err.message);
+  // })
 mongoose.Promise = Promise
  
 const User = mongoose.model('User', {
@@ -60,8 +65,12 @@ const authenticateUser = async (req, res, next) => {
 const port = process.env.PORT || 8080
 const app = express()
 
-app.use(cors())
+// app.use(cors())
 app.use(express.json()) //CHANGED TO THIS FROM bodyParser!! IF EVERYTHING BROKEN LOOK HERE FIRST
+
+app.use(express.json, (req, res) => {
+  console.log(req.body)
+})
 
 app.get('/', (req, res) => {
   res.send('Hello world')
@@ -90,13 +99,22 @@ app.post('/signup', async (req, res) => {
     }).save()
     if (newUser) {
       //HERE CREATE AN EMPTY GRAPH (MONGOOSE OBJECT), so there is always something to load!!!
-      const newCast = await new Cast ({
-        graph: {},
-        characters: [],
-        bonds: []
-      }).save()
-      newUser.casts = [newCast._id]
-      newUser = await newUser.save()
+      console.log("IS A NEW USER OwO")
+      try {
+        const newCast = await new Cast ({
+          graph: {},
+          characters: [],
+          bonds: []
+        }).save()
+      } catch (error) {
+        res.status(500).json({ success: false, error: 'empty cast could not be created upon new user' })
+      }
+      try {
+        newUser.casts = [newCast._id]
+        newUser = await newUser.save()
+      } catch (error) {
+        res.status(500).json({ success: false, error: 'could not assign new empty cast to new user' })
+      }
       res.json({
         success: true,
         userID: newUser._id,
@@ -109,7 +127,7 @@ app.post('/signup', async (req, res) => {
     if(error.code===11000){
       res.status(400).json({ success: false, error: 'Username already exists', field: error.keyValue })
     }
-    res.status(400).json({ success: false, message: 'Invalid Request', error })
+    res.status(400).json({ success: false, message: 'Invalid Request', error: "I have no idea tbh" })
   }
 });
 
