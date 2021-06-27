@@ -70,8 +70,9 @@ app.get('/', (req, res) => {
 //load user's (for now one and only) cast
 app.get('/users/:username', authenticateUser)
 app.get('/users/:username', async (req, res) => {
-  const accessToken = req.header('Authorization')
-  const user = await User.findOne({ accessToken })
+  //the url will display just as such unless I make { username } a... param? Check week 2 or week 3 backend project!!
+  const { username } = req.params
+  const user = await User.findOne({ username })
   try {
     res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
   } catch (error) {
