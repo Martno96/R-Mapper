@@ -5,8 +5,6 @@ import mongoose from 'mongoose'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
-console.log('apa')
-
 //"mongodb://localhost/project-mongo"
 const mongoUrl = process.env.MONGO_URL 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
@@ -36,10 +34,23 @@ const User = mongoose.model('User', {
   }
 })
 
+// const Graph = mongoose.model('Graph', {
+//   cells: {
+//     type: Array,
+//     required: true
+//   }
+// })
+
+// const graphy = new Graph()
+
+//Either:
+//[_] find out how to properly create a Schema manually
+//OR
+//[_] Use npm package
+
 const Cast = mongoose.model('Cast', {
   graph: {
-    type: Object, 
-    required: true
+    type: String
   },
   characters: {
     type: Array, 
@@ -76,69 +87,143 @@ app.use(express.json()) //CHANGED TO THIS FROM bodyParser!! IF EVERYTHING BROKEN
 // })
 
 app.get('/', (req, res) => {
-  console.log('apa')
   res.send('Hello world')
 })
 
-//load user's (for now one and only) cast
+//SAVE cast
+app.post('/users/:username', authenticateUser)
+app.post('/users/:username', async (req, res) => {
+  const { username } = req.params
+  //const { graph, characters, bonds } = req.body
+  const { cast } = req.body
+  // const rehydratedCast = JSON.parse(cast)
+  const graph = cast.graph
+  const characters = cast.characters
+  const bonds = cast.bonds
+
+  //yeah but why would I want the following?
+  // console.log("rehydrated graph:")
+  // console.log(graph)
+  // console.log("rehydrated characters:")
+  // console.log(characters)
+  // console.log("rehydrated bonds:")
+  // console.log(bonds)
+
+  try {
+    const user = await User.findOne({ username })
+    if (user) {
+      // console.log("found user:")
+      // console.log(user)
+      try {
+        if (user.casts.length > 0) {
+          const cast = await Cast.findOne({ _id: user.casts[0] })
+          if (cast) {
+            try { 
+              cast.graph = JSON.stringify(graph)
+              cast.characters = characters
+              cast.bonds = bonds
+              await cast.save()
+            } catch (error) {
+              res.status(500).json({ success: false, error: "Unable to save cast" })
+            }
+            const savedCast = JSON.stringify(cast)
+            console.log(JSON.parse(savedCast))
+            res.json({ success: true, message: "Cast was saved successfully", savedCast})
+          }
+        } else {
+          res.json({ success: true, graph: '{"cells":[]}', characters: [], bonds: []})
+        }
+      } catch (error) {
+        res.status(404).json({ success: false, error: "Found user, but not their cast" })
+      }
+    }
+  } catch (error) {
+    res.status(404).json({ success: false, error:"User not found" })
+  }
+})
+
+//LOAD cast
 app.get('/users/:username', authenticateUser)
 app.get('/users/:username', async (req, res) => {
-  res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
   //the url will display just as such unless I make { username } a... param? Check week 2 or week 3 backend project!!
-  // const { username } = req.params
-  // const user = await User.findOne({ username })
-  // try {
-  //   res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
-  // } catch (error) {
-  //   res.status(400).json({ success: false, message: "Invalid Request", error })
-  // }
+  const { username } = req.params
+  try {
+    const user = await User.findOne({ username })
+    if (user) {
+      console.log("found user:")
+      console.log(user)
+      try {
+        if (user.casts.length > 0) {
+          const cast = await Cast.findOne({ _id: user.casts[0] })
+          if (cast) {
+            console.log(`found ${user}'s cast:`)
+            console.log(cast)
+            res.json({ success: true, graph: cast.graph, characters: cast.characters, bonds: cast.bonds})
+          }
+        } else {
+          res.json({ success: true, graph: '{"cells":[]}', characters: [], bonds: []})
+        }
+      } catch (error) {
+        res.status(404).json({ success: false, error: "Found user, but not their cast" })
+      }
+    }
+  } catch (error) {
+    res.status(404).json({ success: false, error:"User not found" })
+  }
 }) 
 
+//ENDPOINT WORKS!
 app.post('/signup', async (req, res) => {
   const { username, password } = req.body // We separated username and password from the body
-  res.json({success: true, userID: false})
-  // try {
-  //   const salt = bcrypt.genSaltSync()
-  //   const newUser = await new User ({
-  //     username, 
-  //     password: bcrypt.hashSync(password, salt)
-  //   }).save()
-  //   if (newUser) {
-  //     //HERE CREATE AN EMPTY GRAPH (MONGOOSE OBJECT), so there is always something to load!!!
-  //     console.log("IS A NEW USER OwO")
-  //     try {
-  //       const newCast = await new Cast ({
-  //         graph: {},
-  //         characters: [],
-  //         bonds: []
-  //       }).save()
-  //     } catch (error) {
-  //       res.status(500).json({ success: false, error: 'empty cast could not be created upon new user' })
-  //     }
-  //     try {
-  //       newUser.casts = [newCast._id]
-  //       newUser = await newUser.save()
-  //     } catch (error) {
-  //       res.status(500).json({ success: false, error: 'could not assign new empty cast to new user' })
-  //     }
-  //     res.json({
-  //       success: true,
-  //       userID: newUser._id,
-  //       username: newUser.username,
-  //       cast: newUser.casts[0],
-  //       accessToken: newUser.accessToken
-  //     })
-  //   }
-  // } catch(error) {
-  //   if(error.code===11000){
-  //     res.status(400).json({ success: false, error: 'Username already exists', field: error.keyValue })
-  //   }
-  //   res.status(400).json({ success: false, message: 'Invalid Request', error: "I have no idea tbh" })
-  // }
-});
+  try {
+    const salt = bcrypt.genSaltSync()
+    const newUser = await new User ({
+      username, 
+      password: bcrypt.hashSync(password, salt)
+    }).save()
+    
+    if (newUser) {
+      try {
+        const newCast = await new Cast ({
+          graph: '{"cells":[]}',
+          characters: [],
+          bonds: []
+        }).save()
+        if (newCast) {
+          try {
+            newUser.casts = [newCast._id]
+            await newUser.save()
+            res.json({
+              success: true,
+              userID: newUser._id,
+              username: newUser.username,
+              cast: newUser.casts[0],
+              accessToken: newUser.accessToken
+            })
+          } catch (error) {
+            res.status(500).json({ success: false, error: 'could not assign new empty cast to new user' })
+          }
+        }
+      } catch (error) {
+        res.status(500).json({ success: false, error: 'empty cast could not be created upon new user' })
+      }
+      
+    }
+  } catch(error) {
+    if(error.code===11000){
+      res.status(400).json({ success: false, error: 'Username already exists', field: error.keyValue })
+    }
+    res.status(400).json({ success: false, message: 'Invalid Request', error: "I have no idea tbh" })
+  }
+})
 
+//ENDPOINT WORKS
 app.post('/signin', async (req, res) => {
   const { username, password } = req.body;
+  console.log("username:")
+  console.log(username)
+  console.log("password:")
+  console.log(password)
   try {
     const user = await User.findOne({ username });
     if (user && bcrypt.compareSync(password, user.password)) {

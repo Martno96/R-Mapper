@@ -3,6 +3,7 @@ import * as joint from 'jointjs'
 import { useSelector, useDispatch } from 'react-redux'
 
 import cast from '../reducers/cast'
+import { saveAndLoad } from '../reducers/cast'
 
 let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 
@@ -20,6 +21,7 @@ const CastGraph = () => {
 
   //only create new paper on first and second mount (quick-fix since the component mounts twice before the drawMap reducer has managed to be dispatched to, otherwise causing an empty graph)
   if (first < 2) {
+    dispatch(saveAndLoad('load'))
     let paper = new joint.dia.Paper({
       el: document.getElementById('myholder'),
       model: updatedGraph,

@@ -1,59 +1,71 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { batch } from 'react-redux'
+import { API_URL } from '../reusables/urls'
 import { nanoid } from 'nanoid'
 import * as joint from 'jointjs'
+import { getCredentials } from './user'
 
 let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 let jsonGraph = initGraph.toJSON(initGraph)
+console.log(JSON.stringify(jsonGraph))
 
 const initialItems = localStorage.getItem('cast')
 ? JSON.parse(localStorage.getItem('cast'))
 : {
   graph: JSON.stringify(jsonGraph),
-  characters: [
-    {
-      id: "oy4jF4qTIzpHvEWS6xbk4",
-      name: "Smirgus",
-      bio: "sabka jcbskbqkib bdkabsd sabkdbka dbkasbjkdb kdbajsbd"
-    },
-    {
-      id: "_Cdw9IYAXc-41miSlO5Xr",
-      name: "Virp",
-      bio: "olbdkabsd sabkdbka sabka jcbskbqkib dbkasbjkdb kdbajsbd"
-    },
-    {
-      id: "PUX_muVoY4tHA2Dy-0gOX",
-      name: "Plonky",
-      bio: "sabka dbkasbjkdb jcbskbqkib sabkdbka kdbajsbd bdkabsd "
-    }
-  ],
-  bonds: [
-    {
-      id: nanoid(),
-      category: "Social Conflicts",
-      source: "Plonky",
-      subtype: "wants to be respected by",
-      target: "Smirgus",
-      summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
-    },
-    {
-      id: nanoid(),
-      category: "Formal Bonds",
-      source: "Smirgus",
-      subtype: "polices",
-      target: "Virp",
-      summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
-    },
-    {
-      id: nanoid(),
-      category: "Social Conflicts",
-      source: "Virp",
-      subtype: "seeks approval from",
-      target: "Plonky",
-      summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
-    }
-  ],
+  characters: [],
+  bonds: [],
   first: 0
 }
+
+//OLD STARTING VALUES
+// {
+//   graph: JSON.stringify(jsonGraph),
+//   characters: [
+//     {
+//       id: "oy4jF4qTIzpHvEWS6xbk4",
+//       name: "Smirgus",
+//       bio: "sabka jcbskbqkib bdkabsd sabkdbka dbkasbjkdb kdbajsbd"
+//     },
+//     {
+//       id: "_Cdw9IYAXc-41miSlO5Xr",
+//       name: "Virp",
+//       bio: "olbdkabsd sabkdbka sabka jcbskbqkib dbkasbjkdb kdbajsbd"
+//     },
+//     {
+//       id: "PUX_muVoY4tHA2Dy-0gOX",
+//       name: "Plonky",
+//       bio: "sabka dbkasbjkdb jcbskbqkib sabkdbka kdbajsbd bdkabsd "
+//     }
+//   ],
+//   bonds: [
+//     {
+//       id: nanoid(),
+//       category: "Social Conflicts",
+//       source: "Plonky",
+//       subtype: "wants to be respected by",
+//       target: "Smirgus",
+//       summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
+//     },
+//     {
+//       id: nanoid(),
+//       category: "Formal Bonds",
+//       source: "Smirgus",
+//       subtype: "polices",
+//       target: "Virp",
+//       summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
+//     },
+//     {
+//       id: nanoid(),
+//       category: "Social Conflicts",
+//       source: "Virp",
+//       subtype: "seeks approval from",
+//       target: "Plonky",
+//       summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
+//     }
+//   ],
+//   first: 0
+// }
 
 export const cast = createSlice ({
   name: "cast",
@@ -106,6 +118,12 @@ export const cast = createSlice ({
         console.log(action.payload.target)
         console.log(action.payload.details)
       }
+    },
+    loadCast: (store, action) => {
+      store.graph = action.payload.graph
+      store.characters = action.payload.characters
+      store.bonds = action.payload.bonds
+      store.first = 0
     },
     drawMap: (store, action) => {
       
@@ -276,5 +294,57 @@ export const cast = createSlice ({
     }
   }
 })
+
+export const saveAndLoad = (userAction) => {
+
+  return (dispatch, getState) => {
+    const credentials = getCredentials(getState)
+    console.log(credentials)
+    const state = getState()
+    let options
+    //action - determines method, but not necessarily target
+    switch (userAction) {
+      case 'save':
+        options = { 
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            'Authorization': credentials.accessToken
+          },
+          body: JSON.stringify({ cast: { graph: state.cast.graph, characters: state.cast.characters, bonds: state.cast.bonds }}) 
+        }
+        break
+      case 'load':
+        options = { 
+          method: 'GET',
+          headers: {
+            'Content-type': 'application/json',
+            'Authorization': credentials.accessToken
+          } 
+        }
+        break
+    }
+    console.log(options)
+    console.log("klarade switchen")
+    fetch(API_URL(`users/${credentials.username}`), options)
+      .then(res => {
+        console.log("i första .then()")
+        return res.json()
+      })
+      .then(data => {
+        console.log("i andra .then()")
+        if (data.success && userAction === 'load') {
+          batch(() => {
+            dispatch(cast.actions.loadCast(data))
+          })
+        } else if (data.success && userAction === 'save') {
+          //save notification?
+        } else {
+          // dispatch(cast.actions.setError(data))
+        }
+      })
+      .catch(error => console.log(error)) 
+  }
+}
 
 export default cast

@@ -54,7 +54,10 @@ const user = createSlice({
   }
 })
 
-
+export const getCredentials = (getState) => {
+  const state = getState()
+  return ({ username: state.user.username, accessToken: state.user.accessToken })
+}
 
 export const authenticate = (params) => {
   const username = params.username
@@ -66,45 +69,18 @@ export const authenticate = (params) => {
 
   return (dispatch, getState) => {
     const state = getState()
-    let options
+
     //action - determines method, but not necessarily target
-    switch (userAction) {
-      case undefined:
-      case null:
-      case 'load': //move this to the cast reducer!!
-        options = { 
-          method: 'GET',
-          headers: {
-            // 'Content-type': 'application/json',
-            'Authorization': state.user.accessToken
-          } 
-        }
-        break
-      case 'signup':
-      case 'signin':
-        options = { 
-          method: 'POST',
-          headers: {
-            // 'Content-type': 'application/json',
-            'Authorization': state.user.accessToken
-          },
-          body: JSON.stringify({ username, password }) 
-        }
-        break
-      case 'save': //move this to the cast reducer where also another API url is used (/signup vs /users/:username!)!!
-        options = { 
-          method: 'POST',
-          headers: {
-            // 'Content-type': 'application/json',
-            'Authorization': state.user.accessToken
-          },
-          body: JSON.stringify({ username, password }) 
-        }
-        break
-    }
-    console.log(options)
+
     console.log("klarade switchen")
-    fetch(API_URL(userAction), options)
+    fetch(API_URL(userAction), { 
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': state.user.accessToken
+      },
+      body: JSON.stringify({ username, password }) 
+    })
       .then(res => {
         console.log("i första .then()")
         return res.json()
