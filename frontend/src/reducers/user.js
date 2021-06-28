@@ -54,6 +54,8 @@ const user = createSlice({
   }
 })
 
+
+
 export const authenticate = (params) => {
   const username = params.username
   const password = params.password
@@ -73,7 +75,7 @@ export const authenticate = (params) => {
         options = { 
           method: 'GET',
           headers: {
-            'Content-type': 'application/json',
+            // 'Content-type': 'application/json',
             'Authorization': state.user.accessToken
           } 
         }
@@ -83,7 +85,7 @@ export const authenticate = (params) => {
         options = { 
           method: 'POST',
           headers: {
-            'Content-type': 'application/json',
+            // 'Content-type': 'application/json',
             'Authorization': state.user.accessToken
           },
           body: JSON.stringify({ username, password }) 
@@ -93,16 +95,22 @@ export const authenticate = (params) => {
         options = { 
           method: 'POST',
           headers: {
-            'Content-type': 'application/json',
+            // 'Content-type': 'application/json',
             'Authorization': state.user.accessToken
           },
           body: JSON.stringify({ username, password }) 
         }
         break
     }
+    console.log(options)
+    console.log("klarade switchen")
     fetch(API_URL(userAction), options)
-      .then(res => res.json())
+      .then(res => {
+        console.log("i första .then()")
+        return res.json()
+      })
       .then(data => {
+        console.log("i andra .then()")
         if (data.success) {
           batch(() => {
             dispatch(user.actions.setAccessToken(data.accessToken))
@@ -113,7 +121,7 @@ export const authenticate = (params) => {
           dispatch(user.actions.setError(data))
         }
       })
-      .catch()
+      .catch(error => console.log(error)) 
   }
 }
 

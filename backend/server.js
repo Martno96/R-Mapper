@@ -5,14 +5,17 @@ import mongoose from 'mongoose'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
-const mongoUrl = process.env.MONGO_URL || "mongodb+srv://murt:someBODY@cluster0.l2cvo.mongodb.net/r-mapper?retryWrites=true&w=majority"
+console.log('apa')
+
+//"mongodb://localhost/project-mongo"
+const mongoUrl = process.env.MONGO_URL 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
-  // .then(res=> {
-  //   console.log("DB Connected!")
-  // }).catch(err => {
-  // console.log(Error, err.message);
-  // })
-mongoose.Promise = Promise
+  .then(res=> {
+    console.log("DB Connected!")
+  }).catch(err => {
+  console.log(Error, err.message);
+  })
+// mongoose.Promise = Promise
  
 const User = mongoose.model('User', {
   username: {
@@ -65,70 +68,73 @@ const authenticateUser = async (req, res, next) => {
 const port = process.env.PORT || 8080
 const app = express()
 
-// app.use(cors())
+app.use(cors())
 app.use(express.json()) //CHANGED TO THIS FROM bodyParser!! IF EVERYTHING BROKEN LOOK HERE FIRST
 
-app.use(express.json, (req, res) => {
-  console.log(req.body)
-})
+// app.use(express.json, (req, res) => {
+//   console.log(req.body)
+// })
 
 app.get('/', (req, res) => {
+  console.log('apa')
   res.send('Hello world')
 })
 
 //load user's (for now one and only) cast
 app.get('/users/:username', authenticateUser)
 app.get('/users/:username', async (req, res) => {
+  res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
   //the url will display just as such unless I make { username } a... param? Check week 2 or week 3 backend project!!
-  const { username } = req.params
-  const user = await User.findOne({ username })
-  try {
-    res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
-  } catch (error) {
-    res.status(400).json({ success: false, message: "Invalid Request", error })
-  }
-})
+  // const { username } = req.params
+  // const user = await User.findOne({ username })
+  // try {
+  //   res.json({ success: true, graph: user.graph, characters: user.characters, bonds: user.bonds})
+  // } catch (error) {
+  //   res.status(400).json({ success: false, message: "Invalid Request", error })
+  // }
+}) 
 
 app.post('/signup', async (req, res) => {
   const { username, password } = req.body // We separated username and password from the body
-  try {
-    const salt = bcrypt.genSaltSync()
-    const newUser = await new User ({
-      username, 
-      password: bcrypt.hashSync(password, salt)
-    }).save()
-    if (newUser) {
-      //HERE CREATE AN EMPTY GRAPH (MONGOOSE OBJECT), so there is always something to load!!!
-      console.log("IS A NEW USER OwO")
-      try {
-        const newCast = await new Cast ({
-          graph: {},
-          characters: [],
-          bonds: []
-        }).save()
-      } catch (error) {
-        res.status(500).json({ success: false, error: 'empty cast could not be created upon new user' })
-      }
-      try {
-        newUser.casts = [newCast._id]
-        newUser = await newUser.save()
-      } catch (error) {
-        res.status(500).json({ success: false, error: 'could not assign new empty cast to new user' })
-      }
-      res.json({
-        success: true,
-        userID: newUser._id,
-        username: newUser.username,
-        cast: newUser.casts[0],
-        accessToken: newUser.accessToken
-      })
-    }
-  } catch(error) {
-    if(error.code===11000){
-      res.status(400).json({ success: false, error: 'Username already exists', field: error.keyValue })
-    }
-    res.status(400).json({ success: false, message: 'Invalid Request', error: "I have no idea tbh" })
-  }
+  res.json({success: true, userID: false})
+  // try {
+  //   const salt = bcrypt.genSaltSync()
+  //   const newUser = await new User ({
+  //     username, 
+  //     password: bcrypt.hashSync(password, salt)
+  //   }).save()
+  //   if (newUser) {
+  //     //HERE CREATE AN EMPTY GRAPH (MONGOOSE OBJECT), so there is always something to load!!!
+  //     console.log("IS A NEW USER OwO")
+  //     try {
+  //       const newCast = await new Cast ({
+  //         graph: {},
+  //         characters: [],
+  //         bonds: []
+  //       }).save()
+  //     } catch (error) {
+  //       res.status(500).json({ success: false, error: 'empty cast could not be created upon new user' })
+  //     }
+  //     try {
+  //       newUser.casts = [newCast._id]
+  //       newUser = await newUser.save()
+  //     } catch (error) {
+  //       res.status(500).json({ success: false, error: 'could not assign new empty cast to new user' })
+  //     }
+  //     res.json({
+  //       success: true,
+  //       userID: newUser._id,
+  //       username: newUser.username,
+  //       cast: newUser.casts[0],
+  //       accessToken: newUser.accessToken
+  //     })
+  //   }
+  // } catch(error) {
+  //   if(error.code===11000){
+  //     res.status(400).json({ success: false, error: 'Username already exists', field: error.keyValue })
+  //   }
+  //   res.status(400).json({ success: false, message: 'Invalid Request', error: "I have no idea tbh" })
+  // }
 });
 
 app.post('/signin', async (req, res) => {
