@@ -5,9 +5,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import cast from '../reducers/cast'
 import { saveAndLoad } from '../reducers/cast'
 
-let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
+export let updatedGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
+export let graphSnapshot
 
-const CastGraph = () => {
+export const CastGraph = () => {
 
   let graph = useSelector(store => store.cast.graph)
   const characters = useSelector(store => store.cast.characters)
@@ -33,6 +34,10 @@ const CastGraph = () => {
     updatedGraph.fromJSON(JSON.parse(graph))
     dispatch(cast.actions.clearFirst())
   }
+
+  updatedGraph.on('change:position', function(cell){
+    graphSnapshot = updatedGraph.toJSON()
+  })
 
   return (
     <>

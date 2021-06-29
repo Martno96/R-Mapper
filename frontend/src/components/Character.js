@@ -107,15 +107,6 @@ export const Character = ({ character }) => {
             size="small"
             onClick={(event) => {
               event.stopPropagation()
-            }}
-            onFocus={(event) => event.stopPropagation()}
-          >
-            RENAME
-          </Button>
-          <Button 
-            size="small"
-            onClick={(event) => {
-              event.stopPropagation()
               console.log("REMOVE CHARACTER DIALOG SHOULD BE OPEN")
               setRemoveCharacterDialogOpen(true)
             }}

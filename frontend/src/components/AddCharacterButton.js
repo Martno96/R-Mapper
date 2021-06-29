@@ -10,11 +10,11 @@ export const AddCharacterButton = () => {
   const [open, setOpen] = useState(false)
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpen(true)
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpen(false)
   };
 
   return (

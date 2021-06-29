@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import Box from "@material-ui/core/Box"
+import Container from "@material-ui/core/Container"
 
 import Character from './Character'
 import AddCharacterButton from './AddCharacterButton'
@@ -32,9 +33,11 @@ const CharacterSection = ({ onClick, text }) => {
         <AddCharacterButton className={classes.buttons}/>
         <AddBondButton className={classes.buttons}/>
       </Box>
-      {characters.map((character) => {
-      return <Character key={character.name} character={character}/>
-      })}
+      <Container maxWidth='sm'>
+        {characters.map((character) => {
+        return <Character key={character.name} character={character}/>
+        })}
+      </Container>
     </section>
   )
 }

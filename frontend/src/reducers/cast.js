@@ -3,15 +3,24 @@ import { batch } from 'react-redux'
 import { API_URL } from '../reusables/urls'
 import { nanoid } from 'nanoid'
 import * as joint from 'jointjs'
+
 import { getCredentials } from './user'
+import { updatedGraph, graphSnapshot } from '../components/CastGraph'
 
 let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 let jsonGraph = initGraph.toJSON(initGraph)
 console.log(JSON.stringify(jsonGraph))
 
-const initialItems = localStorage.getItem('cast')
-? JSON.parse(localStorage.getItem('cast'))
-: {
+// const initialItems = localStorage.getItem('cast')
+// ? JSON.parse(localStorage.getItem('cast'))
+// : {
+//   graph: JSON.stringify(jsonGraph),
+//   characters: [],
+//   bonds: [],
+//   first: 0
+// }
+
+const initialItems = {
   graph: JSON.stringify(jsonGraph),
   characters: [],
   bonds: [],
@@ -120,10 +129,10 @@ export const cast = createSlice ({
       }
     },
     loadCast: (store, action) => {
+      updatedGraph.fromJSON(JSON.parse(JSON.parse(action.payload.graph)))
       store.graph = action.payload.graph
       store.characters = action.payload.characters
       store.bonds = action.payload.bonds
-      store.first = 0
     },
     drawMap: (store, action) => {
       
@@ -303,6 +312,8 @@ export const saveAndLoad = (userAction) => {
     const state = getState()
     let options
     //action - determines method, but not necessarily target
+    console.log("--------- SNAPSHOT GRAPH ----------")
+    console.log(graphSnapshot)
     switch (userAction) {
       case 'save':
         options = { 
@@ -311,7 +322,7 @@ export const saveAndLoad = (userAction) => {
             'Content-type': 'application/json',
             'Authorization': credentials.accessToken
           },
-          body: JSON.stringify({ cast: { graph: state.cast.graph, characters: state.cast.characters, bonds: state.cast.bonds }}) 
+          body: JSON.stringify({ cast: { graph: JSON.stringify(graphSnapshot), characters: state.cast.characters, bonds: state.cast.bonds }}) 
         }
         break
       case 'load':

@@ -15,7 +15,7 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import { Add } from '@material-ui/icons'
 import { useSelector, useDispatch } from 'react-redux'
 
-import CharacterNameAutoComplete from './CharacterNameAutoComplete'
+import CharacterNameAutoComplete from './unused/CharacterNameAutoComplete'
 import cast from '../reducers/cast'
 import { bondCategories } from '../constants'
 

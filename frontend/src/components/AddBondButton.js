@@ -9,12 +9,11 @@ export const AddBondButton = () => {
   const [open, setOpen] = useState(false)
 
   const handleClickOpen = () => {
-    setOpen(true);
-    console.log(`bond form should now be open?: ${open}`)
-  };
+    setOpen(true)
+  }
 
   const handleClose = () => {
-    setOpen(false);
+    setOpen(false)
   };
 
   return (
