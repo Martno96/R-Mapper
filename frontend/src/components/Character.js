@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import Accordion from '@material-ui/core/Accordion'
@@ -9,14 +8,6 @@ import Typography from '@material-ui/core/Typography'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Button from '@material-ui/core/Button'
 
-
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-
-import Bond from './Bond'
 import ConfirmationDialog from './ConfirmationDialog'
 import cast from '../reducers/cast'
 
@@ -77,21 +68,6 @@ export const Character = ({ character }) => {
   const bondsTargetOf = bonds.filter(bond => bond.target === character.name)
   const relevantBondCategories = [...new Set(bondsSourceOf.concat(bondsTargetOf).map(bond => bond.category))]
   const allBondsOfCharacter = bondsSourceOf.concat(bondsTargetOf)
-
-  console.log(`------- ${character.name} -------`)
-  console.log("bondsSourceOf:")
-  console.log(bondsSourceOf)
-  console.log("bondsTargetOf:")
-  console.log(bondsTargetOf)
-  console.log(`------- ----------------- -------`)
-  
-  //console.log(relevantBondCategories)
-
-  // const childrenTest = () => {
-  //   return (
-  //     <p>HELLO I AM CHILD</p>
-  //   )
-  // }
 
   return (
     <Accordion>
