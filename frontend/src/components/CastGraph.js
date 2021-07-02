@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import * as joint from 'jointjs'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -23,7 +23,7 @@ export const CastGraph = () => {
   //only create new paper on first and second mount (quick-fix since the component mounts twice before the drawMap reducer has managed to be dispatched to, otherwise causing an empty graph)
   if (first < 2) {
     dispatch(saveAndLoad('load'))
-    let paper = new joint.dia.Paper({
+    let paper = new joint.dia.Paper({ //paper is actually read, since it is injected into 'myholder'
       el: document.getElementById('myholder'),
       model: updatedGraph,
       cellViewNamespace: joint.shapes,

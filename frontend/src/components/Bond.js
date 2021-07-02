@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import Accordion from '@material-ui/core/Accordion'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
@@ -49,11 +49,11 @@ const Bond = ({ bond, bondSource, bondTarget }) => {
   const classes = useStyles()
   const [removeBondDialogOpen, setRemoveBondDialogOpen] = useState(false)
   
-  const handleRemoveBondDialogClose = (event) => {
+  const handleRemoveBondDialogClose = () => {
     setRemoveBondDialogOpen(false)
   }
 
-  const handleRemoveBond = (event) => {
+  const handleRemoveBond = () => {
     dispatch(cast.actions.removeBond({ bond }))
   }
 
@@ -82,7 +82,6 @@ const Bond = ({ bond, bondSource, bondTarget }) => {
           size="small"
           onClick={(event) => {
             event.stopPropagation()
-            console.log("REMOVE CHARACTER DIALOG SHOULD BE OPEN")
             setRemoveBondDialogOpen(true)
           }}
           onFocus={(event) => event.stopPropagation()}

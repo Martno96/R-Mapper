@@ -6,7 +6,6 @@ import Box from "@material-ui/core/Box"
 import NewCharacterForm from './NewCharacterForm'
 
 export const AddCharacterButton = () => {
-
   const [open, setOpen] = useState(false)
 
   const handleClickOpen = () => {
@@ -34,7 +33,7 @@ export const AddCharacterButton = () => {
         open={open} handleClose={handleClose}
       />
     </div>
-  );
+  )
 }
 
 export default AddCharacterButton

@@ -16,12 +16,7 @@ export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
   const characters = useSelector(store => store.cast.characters)
   const [name, setName] = useState(newCharacterName ? newCharacterName : '')
   const [bio, setBio] = useState("")
-
   const dispatch = useDispatch()
-
-  // const handleClickOpen = () => {
-  //   setOpen(true);
-  // };
 
   const onNameChange = (event) => {
     setName(event.target.value)
@@ -31,12 +26,7 @@ export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
     setBio(event.target.value)
   }
 
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
   const handleSubmit = () => {
-    //const capitalizedName = name.characterAt()
     dispatch(cast.actions.addCharacter({name, bio}))
     setName("")
     setBio("")
@@ -45,10 +35,6 @@ export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
 
   return (
     <div>
-      {/* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        <Add fontSize="small"/>
-        ADD CHARACTER
-      </Button> */}
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Add Character</DialogTitle>
         <DialogContent>

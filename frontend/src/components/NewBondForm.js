@@ -7,15 +7,12 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import InputLabel from '@material-ui/core/InputLabel'
+import FormControl from '@material-ui/core/FormControl'
+import NativeSelect from '@material-ui/core/NativeSelect'
 import { Add } from '@material-ui/icons'
 import { useSelector, useDispatch } from 'react-redux'
 
-import CharacterNameAutoComplete from './unused/CharacterNameAutoComplete'
 import BondSubtypeSelect from './BondSubtypeSelect'
 import cast from '../reducers/cast'
 import { bondCategories } from '../constants'
@@ -31,31 +28,14 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const NewBondForm = ({ open, handleClose }) => {
-
   const characters = useSelector(store => store.cast.characters)
-  const characterNames = useSelector(store => store.cast.characters).map(character => character.name)
-  // const [open, setOpen] = useState(false)
   const [source, setSource] = useState("")
   const [target, setTarget] = useState("")
   const [subtype, setSubtype] = useState("")
   const [category, setCategory] = useState("")
-  const [timeStart, setTimeStart] = useState("")
-  const [timeEnd, setTimeEnd] = useState("")
   const [details, setDetails] = useState("")
-  // const [source, setSource,] = useState({ id:"", value:""})
-  // const [target, setTarget] = useState({ id:"", value:""})
-  // const [subtype, setSubtype] = useState({ id:"", value:""})
-  // const [category, setCategory] = useState({ id:"", value:""})
-  // const [timeStart, setTimeStart] = useState({ id:"", value:""})
-  // const [timeEnd, setTimeEnd] = useState({ id:"", value:""})
-  // const [summary, setSummary] = useState({ id:"", value:""})
   const classes = useStyles()
-
   const dispatch = useDispatch()
-
-  // const handleClickOpen = () => {
-  //   setOpen(true);
-  // };
 
   const handleSourceChange = (event) => {
     setSource(event.target.value)
@@ -77,10 +57,6 @@ export const NewBondForm = ({ open, handleClose }) => {
     setDetails(event.target.value)
   }
 
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
   const handleSubmit = (event) => {
     event.preventDefault()
     dispatch(cast.actions.addBond({source, target, details, subtype, category}))
@@ -100,6 +76,7 @@ export const NewBondForm = ({ open, handleClose }) => {
           <DialogContentText>
             Add a new Bond between two registered Characters
           </DialogContentText>
+            
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="category">Category</InputLabel>
               <NativeSelect
@@ -117,7 +94,6 @@ export const NewBondForm = ({ open, handleClose }) => {
                 })}
                 
               </NativeSelect>
-              {/* <FormHelperText>the Bond's rough category</FormHelperText> */}
             </FormControl>
 
             <FormControl className={classes.formControl}>
@@ -137,7 +113,6 @@ export const NewBondForm = ({ open, handleClose }) => {
                 })}
                 
               </NativeSelect>
-              {/* <FormHelperText>the Bond "owner"</FormHelperText> */}
             </FormControl>
             
             <BondSubtypeSelect selectedCategory={category} value={subtype} onChange={handleSubtypeChange}/>
@@ -159,11 +134,9 @@ export const NewBondForm = ({ open, handleClose }) => {
                 })}
                 
               </NativeSelect>
-              {/* <FormHelperText>the Bond "target"</FormHelperText> */}
             </FormControl>
 
             <FormControl className={classes.formControl}>
-              {/* <InputLabel htmlFor="details">Details</InputLabel> */}
               <TextField 
                 required
                 multiline
@@ -175,28 +148,6 @@ export const NewBondForm = ({ open, handleClose }) => {
                 onChange={handleDetailsChange}
               />
             </FormControl>
-          {/* <CharacterNameAutoComplete label="who has the relation...?" value={source} onChange={handleSourceChange}/>
-
-          <CharacterNameAutoComplete label="... with who?" value={target} onChange={handleTargetChange}/> */}
-
-          {/* <TextField
-            autoFocus
-            margin="dense"
-            id="source"
-            label="source"
-            fullWidth
-            value={source}
-            onChange={handleSourceChange}
-          />
-          <TextField
-            margin="dense"
-            id="target"
-            label="short target"
-            fullWidth
-            value={target}
-            onChange={handleTargetChange}
-          /> */}
-
 
         </DialogContent>
         <DialogActions>
@@ -210,7 +161,7 @@ export const NewBondForm = ({ open, handleClose }) => {
         </DialogActions>
       </Dialog>
     </div>
-  );
+  )
 }
 
 export default NewBondForm

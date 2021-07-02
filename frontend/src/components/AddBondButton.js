@@ -14,7 +14,7 @@ export const AddBondButton = () => {
 
   const handleClose = () => {
     setOpen(false)
-  };
+  }
 
   return (
     <div>
@@ -26,7 +26,7 @@ export const AddBondButton = () => {
         open={open} handleClose={handleClose}
       />
     </div>
-  );
+  )
 }
 
 export default AddBondButton

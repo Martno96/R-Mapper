@@ -1,5 +1,3 @@
-import * as joint from 'jointjs'
-
 export const bondCategories = [
   { name: "Familial Bonds", subtypes: [
     "parent of",
@@ -58,19 +56,5 @@ export const bondCategories = [
     "seeks redemption through" 
   ]}
 ]
-
-export const bondSubType = [
-  "seeks approval from",
-  "seeks acceptance from",
-  "seeks forgiveness from",
-  "seeks respect from",
-  "seeks love from",
-  "seeks subservience from",
-  "seeks reassurance from",
-  "seeks power through",
-  "seeks to punish",
-  "seeks redemption through"
-]
-
 
 export default bondCategories

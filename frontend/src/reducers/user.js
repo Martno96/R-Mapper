@@ -46,10 +46,6 @@ const user = createSlice({
     logOut: (store, action) => {
       store.username = null
       store.accessToken = null
-    },
-    setSecret: (store, action) => {
-      console.log(action.payload)
-      store.secret = action.payload
     }
   }
 })
@@ -63,16 +59,9 @@ export const authenticate = (params) => {
   const username = params.username
   const password = params.password
   const userAction = params.userAction
-  console.log(username)
-  console.log(password)
-  console.log(userAction)
 
   return (dispatch, getState) => {
     const state = getState()
-
-    //action - determines method, but not necessarily target
-
-    console.log("klarade switchen")
     fetch(API_URL(userAction), { 
       method: 'POST',
       headers: {
@@ -82,11 +71,9 @@ export const authenticate = (params) => {
       body: JSON.stringify({ username, password }) 
     })
       .then(res => {
-        console.log("i första .then()")
         return res.json()
       })
       .then(data => {
-        console.log("i andra .then()")
         if (data.success) {
           batch(() => {
             dispatch(user.actions.setAccessToken(data.accessToken))

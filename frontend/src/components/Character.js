@@ -62,8 +62,6 @@ export const Character = ({ character }) => {
     dispatch(cast.actions.removeCharacter(character))
   }
 
-  
-
   const bondsSourceOf = bonds.filter(bond => bond.source === character.name)
   const bondsTargetOf = bonds.filter(bond => bond.target === character.name)
   const relevantBondCategories = [...new Set(bondsSourceOf.concat(bondsTargetOf).map(bond => bond.category))]
@@ -83,7 +81,6 @@ export const Character = ({ character }) => {
             size="small"
             onClick={(event) => {
               event.stopPropagation()
-              console.log("REMOVE CHARACTER DIALOG SHOULD BE OPEN")
               setRemoveCharacterDialogOpen(true)
             }}
             onFocus={(event) => event.stopPropagation()}
@@ -107,8 +104,6 @@ export const Character = ({ character }) => {
         <Typography className={classes.bio}>{character.bio}</Typography>
 
         {/* ----------- CATEGORY ----------- */}
-        {console.log("relevantBondCategories:")}
-        {console.log(relevantBondCategories)}
         { relevantBondCategories.length > 0 
           ? relevantBondCategories.map((category) => {
             return (
@@ -138,8 +133,6 @@ export const Character = ({ character }) => {
             })
           : <Typography className={classes.contentMissing}>no bonds yet</Typography>
         }
-        
-
       </AccordionDetails>
     </Accordion>
   )

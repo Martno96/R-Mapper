@@ -1,20 +1,15 @@
 import React, { useState } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
+import FormControl from '@material-ui/core/FormControl'
 import { useSelector, useDispatch } from 'react-redux'
 
-import cast from '../reducers/cast'
 import { authenticate } from '../reducers/user'
 
 export const CredentialsForm = ({ formFunction }) => {
 
-  const characters = useSelector(store => store.cast.characters)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-
   const dispatch = useDispatch()
 
   const onUsernameChange = (event) => {
@@ -24,10 +19,6 @@ export const CredentialsForm = ({ formFunction }) => {
   const onPasswordChange = (event) => {
     setPassword(event.target.value)
   }
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
 
   const onSubmit = (event) => {
     event.preventDefault()
@@ -51,10 +42,6 @@ export const CredentialsForm = ({ formFunction }) => {
 
   return (
     <div>
-      {/* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        <Add fontSize="small"/>
-        ADD CHARACTER
-      </Button> */}
       <FormControl>
         <TextField
           autoFocus
@@ -78,7 +65,6 @@ export const CredentialsForm = ({ formFunction }) => {
           {buttonLabel}
         </Button>
       </FormControl>
-      {/* <p>{`DEBUG! formFunction is ${formFunction}`}</p> */}
     </div>
   );
 }

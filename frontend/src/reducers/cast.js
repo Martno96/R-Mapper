@@ -9,16 +9,6 @@ import { updatedGraph, graphSnapshot } from '../components/CastGraph'
 
 let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 let jsonGraph = initGraph.toJSON(initGraph)
-console.log(JSON.stringify(jsonGraph))
-
-// const initialItems = localStorage.getItem('cast')
-// ? JSON.parse(localStorage.getItem('cast'))
-// : {
-//   graph: JSON.stringify(jsonGraph),
-//   characters: [],
-//   bonds: [],
-//   first: 0
-// }
 
 const initialItems = {
   graph: JSON.stringify(jsonGraph),
@@ -121,21 +111,13 @@ export const cast = createSlice ({
         }]
       } else {
         console.error("addBond reducer caught payload properties either not being strings AND/OR being empty strings")
-        console.log(action.payload.category)
-        console.log(action.payload.source)
-        console.log(action.payload.subtype)
-        console.log(action.payload.target)
-        console.log(action.payload.details)
       }
     },
     removeBond: (store, action) => {
-      console.log(action.payload)
       const updatedBonds = store.bonds.filter(bond => bond.id !== action.payload.bond.id)
       store.bonds = updatedBonds
     },
     loadCast: (store, action) => {
-      console.log("LOADING CAST!!! HERE IS action.payload.graph:")
-      console.log(action.payload.graph)
       updatedGraph.fromJSON(JSON.parse(JSON.parse(action.payload.graph)))
       store.graph = action.payload.graph
       store.characters = action.payload.characters
@@ -202,9 +184,7 @@ export const cast = createSlice ({
             
           });
           characterElement.addTo(action.payload.model)
-        }
-        console.log(`x: ${positionX}`)
-        console.log(`y: ${positionY}`)        
+        }  
       })
 
       const linkLabelMarkup = [
@@ -323,12 +303,8 @@ export const saveAndLoad = (userAction) => {
 
   return (dispatch, getState) => {
     const credentials = getCredentials(getState)
-    console.log(credentials)
     const state = getState()
     let options
-    //action - determines method, but not necessarily target
-    console.log("--------- SNAPSHOT GRAPH ----------")
-    console.log(graphSnapshot)
     switch (userAction) {
       case 'save':
         options = { 
@@ -350,15 +326,11 @@ export const saveAndLoad = (userAction) => {
         }
         break
     }
-    console.log(options)
-    console.log("klarade switchen")
     fetch(API_URL(`users/${credentials.username}`), options)
       .then(res => {
-        console.log("i första .then()")
         return res.json()
       })
       .then(data => {
-        console.log("i andra .then()")
         if (data.success && userAction === 'load') {
           batch(() => {
             dispatch(cast.actions.loadCast(data))

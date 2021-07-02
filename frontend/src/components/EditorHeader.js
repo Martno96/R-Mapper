@@ -2,16 +2,11 @@ import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Button from '@material-ui/core/Button'
 
-import cast from '../reducers/cast'
-import user from '../reducers/user'
 import { saveAndLoad } from '../reducers/cast'
 
 const EditorHeader = () => {
   const dispatch = useDispatch()
   const username = useSelector(store => store.user.username)
-  //> get name of user to greet them
-  //> display save button which is own component and 
-  //  activates a handleSubmit here
 
   return (
     <>

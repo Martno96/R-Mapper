@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import Box from "@material-ui/core/Box"
@@ -18,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const CharacterSection = ({ onClick, text }) => {
+const CharacterSection = () => {
   
   const characters = useSelector(store => store.cast.characters)
   const classes = useStyles()
