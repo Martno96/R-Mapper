@@ -88,7 +88,7 @@ export const cast = createSlice ({
       }]
     },
     removeCharacter: (store, action) => {
-      const bondsWithoutRemovedCharacter = store.bonds.map(bond => {
+      const updatedBonds = store.bonds.map(bond => {
         if (bond.source === action.payload.name) {
           return Object.assign({}, bond, {source: "???"})
         } else if (bond.target === action.payload.name) {
@@ -97,7 +97,7 @@ export const cast = createSlice ({
           return bond
         }
       })
-      store.bonds = [...bondsWithoutRemovedCharacter]
+      store.bonds = [...updatedBonds]
       const charactersWithoutRemovedCharacter = store.characters.filter(character => character.name !== action.payload.name)
       store.characters = [...charactersWithoutRemovedCharacter]
     },
@@ -128,7 +128,14 @@ export const cast = createSlice ({
         console.log(action.payload.details)
       }
     },
+    removeBond: (store, action) => {
+      console.log(action.payload)
+      const updatedBonds = store.bonds.filter(bond => bond.id !== action.payload.bond.id)
+      store.bonds = updatedBonds
+    },
     loadCast: (store, action) => {
+      console.log("LOADING CAST!!! HERE IS action.payload.graph:")
+      console.log(action.payload.graph)
       updatedGraph.fromJSON(JSON.parse(JSON.parse(action.payload.graph)))
       store.graph = action.payload.graph
       store.characters = action.payload.characters
@@ -151,6 +158,13 @@ export const cast = createSlice ({
       action.payload.model.getElements().forEach(characterElement => {
         if (store.characters.find(character => character.name === characterElement.attributes.attrs.label.text) === undefined) {
           characterElement.remove()
+        }
+      })
+
+      //remove unwanted Bonds from graph
+      action.payload.model.getLinks().forEach(bondLink => {
+        if (store.bonds.find(bond => bond.id === bondLink.bondId) === undefined) {
+          bondLink.remove()
         }
       })
 
@@ -229,7 +243,8 @@ export const cast = createSlice ({
                 strokeWidth: 2,
                 cursor: 'default'
               }
-            }
+            },
+            bondId: bond.id
           });
           bondLink.source(sourceElement, {
             connectionPoint: {

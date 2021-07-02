@@ -27,17 +27,13 @@ export const CastGraph = () => {
       el: document.getElementById('myholder'),
       model: updatedGraph,
       cellViewNamespace: joint.shapes,
-      width: 800,
+      width: window.screen.availWidth-20,
       height: 500, 
       gridSize: 1
     })
     updatedGraph.fromJSON(JSON.parse(graph))
     dispatch(cast.actions.clearFirst())
   }
-
-  updatedGraph.on('change:position', function(cell){
-    graphSnapshot = updatedGraph.toJSON()
-  })
 
   return (
     <>

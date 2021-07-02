@@ -9,6 +9,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Button from '@material-ui/core/Button'
 
 import ConfirmationDialog from './ConfirmationDialog'
+import Bond from './Bond'
 import cast from '../reducers/cast'
 
 const useStyles = makeStyles((theme) => ({
@@ -48,13 +49,10 @@ export const Character = ({ character }) => {
   const characters = useSelector(store => store.cast.characters)
   const bonds = useSelector(store => store.cast.bonds)
   const classes = useStyles()
-  const [expanded, setExpanded] = useState(false)
-  const [removeCharacterDialogOpen, setRemoveCharacterDialogOpen] = useState(false)
-  const dispatch = useDispatch()
 
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
-  }
+  const [removeCharacterDialogOpen, setRemoveCharacterDialogOpen] = useState(false)
+
+  const dispatch = useDispatch()
 
   const handleRemoveCharacterDialogClose = (event) => {
     setRemoveCharacterDialogOpen(false)
@@ -63,6 +61,8 @@ export const Character = ({ character }) => {
   const handleRemoveCharacter = (event) => {
     dispatch(cast.actions.removeCharacter(character))
   }
+
+  
 
   const bondsSourceOf = bonds.filter(bond => bond.source === character.name)
   const bondsTargetOf = bonds.filter(bond => bond.target === character.name)
@@ -128,22 +128,9 @@ export const Character = ({ character }) => {
                     const bondSource = characters.find(character => character.name === bond.source)
                     const bondTarget = characters.find(character => character.name === bond.target)
                     return (
-                      <Accordion>
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-label="Expand"
-                          aria-controls="additional-actions1-content"
-                          id="additional-actions1-header"
-                        >
-                          <Typography className={classes.heading}>{`${bondSource !== undefined ? bondSource.name : "???"} --> ${bond.subtype} --> ${bondTarget !== undefined ? bondTarget.name : "???"}`}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails className={classes.accordionContent}>
-                          {bond.summary}
-                        </AccordionDetails>
-                      </Accordion>
+                      <Bond bond={bond} bondSource={bondSource} bondTarget={bondTarget}/>
                     )  
                   })}
-                  {/* <Bond /> */}
                 
                 </AccordionDetails>
               </Accordion>
