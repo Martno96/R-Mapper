@@ -23,7 +23,7 @@ function App() {
       <BrowserRouter>
         <Switch>
           <Route exact path="/" component={Login} />
-          <Route path="/users/:username" component={CastEditor} />
+          <Route path="/casts/:castId" component={CastEditor} />
         </Switch>
       </BrowserRouter>
     </Provider>
