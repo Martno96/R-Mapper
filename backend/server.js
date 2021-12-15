@@ -168,6 +168,14 @@ app.post('/signin', async (req, res) => {
   try {
     const user = await User.findOne({ username });
     if (user && bcrypt.compareSync(password, user.password)) {
+      console.log(user.casts)
+      // console.log(res.json({
+      //   success: true,
+      //   userID: user._id,
+      //   username: user.username,
+      //   casts: user.casts,
+      //   accessToken: user.accessToken
+      // }))
       res.json({
         success: true,
         userID: user._id,
@@ -175,6 +183,7 @@ app.post('/signin', async (req, res) => {
         casts: user.casts,
         accessToken: user.accessToken
       });
+      
     } else {
       res.status(404).json({ success: false, message: "User not found" });
     }

@@ -25,7 +25,7 @@ export const CastGraph = () => {
   console.log(`first is ${first}`)
 
   //only create new paper on first and second mount (quick-fix since the component mounts twice before the drawMap reducer has managed to be dispatched to, otherwise causing an empty graph)
-  if (first < 2) {
+  if (first < 2 && casts !== undefined && casts.length) {
     dispatch(cast.actions.setCastId(casts))
     dispatch(saveAndLoad('load'))
     let paper = new joint.dia.Paper({ //paper is actually read, since it is injected into 'myholder'

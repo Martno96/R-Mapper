@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch, batch } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
@@ -60,8 +60,10 @@ const EditorHeader = () => {
         color="primary"
         onClick={(event) => {
           event.stopPropagation()
-          dispatch(cast.actions.exitCast())
-          dispatch(user.actions.signOut())
+          batch(() => {
+            dispatch(cast.actions.exitCast())
+            dispatch(user.actions.signOut())
+          })
         }}
         onFocus={(event) => event.stopPropagation()}
       >

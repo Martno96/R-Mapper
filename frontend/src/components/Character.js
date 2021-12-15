@@ -107,7 +107,7 @@ export const Character = ({ character }) => {
         { relevantBondCategories.length > 0 
           ? relevantBondCategories.map((category) => {
             return (
-              <Accordion>
+              <Accordion key={category}>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-label="Expand"
@@ -119,11 +119,11 @@ export const Character = ({ character }) => {
                 <AccordionDetails className={classes.accordionContent}>
                 
                   {/* ----------- BOND ----------- */}
-                  {allBondsOfCharacter.filter(bond => bond.category === category).map((bond) => {
+                  {allBondsOfCharacter.filter(bond => bond.category === category).map((bond, index) => {
                     const bondSource = characters.find(character => character.name === bond.source)
                     const bondTarget = characters.find(character => character.name === bond.target)
                     return (
-                      <Bond bond={bond} bondSource={bondSource} bondTarget={bondTarget}/>
+                      <Bond key={ bondSource + "-" + bondTarget + "_" + index } bond={bond} bondSource={bondSource} bondTarget={bondTarget}/>
                     )  
                   })}
                 

@@ -60,6 +60,7 @@ const user = createSlice({
       store.error = action.payload
     },
     signOut: (store) => {
+      console.log("user reducer signOut running!")
       localStorage.setItem('user', JSON.stringify({
         username: null,
         accessToken: null,
@@ -69,6 +70,9 @@ const user = createSlice({
       }))
       store.username = null
       store.accessToken = null
+      store.error = null
+      store.secret = ''
+      store.casts = []
     }
   }
 })

@@ -10,18 +10,42 @@ import { updatedGraph, graphSnapshot } from '../components/CastGraph'
 let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 let jsonGraph = initGraph.toJSON(initGraph)
 
-const initialItems = {
-  castId: "",
-  graph: JSON.stringify(jsonGraph),
-  characters: [],
-  bonds: [],
-  first: 0
-}
+
+//TO-DO: [_] is a try/catch block safer?
+const initialItems = localStorage.getItem("cast")
+  ? { 
+    ...JSON.parse(localStorage.getItem("cast")),
+    first: 0
+  }
+  : {
+    castId: "",
+    graph: JSON.stringify(jsonGraph),
+    characters: [],
+    bonds: [],
+    first: 0
+  }
+
+  
 
 export const cast = createSlice ({
   name: "cast",
   initialState: initialItems,
   reducers: {
+    //TO-DO: [_] Add middle-ware that batch dispatches this after other dispatches?
+      //Pros: 
+      //  allows me to not repeat myself with localStorage update
+      //Cons: 
+      //  middle-ware OR NOT: setting localStorage in a reducer AT ALL contradicts "reducers should be pure and have no side-effects"
+      //  requires writing of a switch in the middleware to determine which reducer?
+      //    or maybe just having a callback arg could work? or is that a scoping issue?   
+    setLocalStorage: (store, action) => {
+      localStorage.setItem("cast", JSON.stringify({ 
+        castId: store.castId,
+        graph: store.graph, //WARNING: this is the last SAVED graph, not the live one in paper (won't reflect new Element positions!)
+        characters: store.characters,
+        bonds: store.bonds
+      }))
+    },
     setCastId: (store, action) => {
       store.castId = action.payload[0]
     },
@@ -267,12 +291,17 @@ export const cast = createSlice ({
       store.first++
     },
     exitCast: (store) => {
-      console.log("cast exited!")
+      console.log("cast reducer exitCast running!")
+      store.graph = ""
+      store.castId = ""
       store.first = 0
-      console.log(store.first)
+      store.characters = []
+      store.bonds = []
     }
   }
 })
+
+//TO-DO: [_] (EDIT: SEE TOP OF REDUCER LIST) middle-ware for dispatching + also local storage??
 
 export const saveAndLoad = (userAction) => {
 
