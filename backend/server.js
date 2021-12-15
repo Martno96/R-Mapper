@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
-const mongoUrl = process.env.MONGO_URL 
+const mongoUrl = process.env.MONGO_URL
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
   .then(res=> {
     console.log("DB Connected!")
@@ -71,71 +71,52 @@ app.get('/', (req, res) => {
 })
 
 //SAVE cast
-app.post('/users/:username', authenticateUser)
-app.post('/users/:username', async (req, res) => {
-  const { username } = req.params
+app.post('/casts/:castId', authenticateUser)
+app.post('/casts/:castId', async (req, res) => {
+  const { castId } = req.params
   const { cast } = req.body
   const graph = cast.graph
   const characters = cast.characters
   const bonds = cast.bonds
 
   try {
-    const user = await User.findOne({ username })
-    if (user) {
-      try {
-        if (user.casts.length > 0) {
-          const cast = await Cast.findOne({ _id: user.casts[0] })
-          if (cast) {
-            try { 
-              cast.graph = JSON.stringify(graph)
-              cast.characters = characters
-              cast.bonds = bonds
-              await cast.save()
-            } catch (error) {
-              res.status(500).json({ success: false, error: "Unable to save cast" })
-            }
-            const savedCast = JSON.stringify(cast)
-            console.log(JSON.parse(savedCast))
-            res.json({ success: true, message: "Cast was saved successfully", savedCast})
-          }
-        } else {
-          res.json({ success: true, graph: '{"cells":[]}', characters: [], bonds: []})
-        }
+    const cast = await Cast.findOne({ _id: castId })
+    if (cast) {
+      try { 
+        cast.graph = JSON.stringify(graph)
+        cast.characters = characters
+        cast.bonds = bonds
+        await cast.save()
       } catch (error) {
-        res.status(404).json({ success: false, error: "Found user, but not their cast" })
+        res.status(500).json({ success: false, error: "Unable to save cast" })
       }
+      const savedCast = JSON.stringify(cast)
+      console.log(JSON.parse(savedCast))
+      res.json({ success: true, message: "Cast was saved successfully", savedCast})
     }
   } catch (error) {
-    res.status(404).json({ success: false, error:"User not found" })
+    res.status(404).json({ success: false, error:"Unable to save cast" })
   }
 })
 
 //LOAD cast
-app.get('/users/:username', authenticateUser)
-app.get('/users/:username', async (req, res) => {
-  const { username } = req.params
+app.get('/casts/:castId', authenticateUser)
+app.get('/casts/:castId', async (req, res) => {
+  const { castId } = req.params
   try {
-    const user = await User.findOne({ username })
-    if (user) {
-      console.log("found user:")
-      console.log(user)
-      try {
-        if (user.casts.length > 0) {
-          const cast = await Cast.findOne({ _id: user.casts[0] })
-          if (cast) {
-            console.log(`found ${user}'s cast:`)
-            console.log(cast)
-            res.json({ success: true, graph: cast.graph, characters: cast.characters, bonds: cast.bonds})
-          }
-        } else {
-          res.json({ success: true, graph: '{"cells":[]}', characters: [], bonds: []})
-        }
-      } catch (error) {
-        res.status(404).json({ success: false, error: "Found user, but not their cast" })
-      }
+    const cast = await Cast.findOne({ _id: castId })
+    if (cast) {
+      res.json({ 
+        success: true, 
+        graph: cast.graph !== undefined ? cast.graph : '{"cells":[]}', 
+        characters: cast.characters, 
+        bonds: cast.bonds
+      })
+    // } else {
+    //   res.json({ success: true, graph: '{"cells":[]}', characters: [], bonds: []})
     }
   } catch (error) {
-    res.status(404).json({ success: false, error:"User not found" })
+    res.status(404).json({ success: false, error:"Cast not found" })
   }
 }) 
 
@@ -162,7 +143,7 @@ app.post('/signup', async (req, res) => {
               success: true,
               userID: newUser._id,
               username: newUser.username,
-              cast: newUser.casts[0],
+              casts: user.casts,
               accessToken: newUser.accessToken
             })
           } catch (error) {
@@ -184,20 +165,25 @@ app.post('/signup', async (req, res) => {
 //ENDPOINT WORKS
 app.post('/signin', async (req, res) => {
   const { username, password } = req.body;
-  console.log("username:")
-  console.log(username)
-  console.log("password:")
-  console.log(password)
   try {
     const user = await User.findOne({ username });
     if (user && bcrypt.compareSync(password, user.password)) {
+      console.log(user.casts)
+      // console.log(res.json({
+      //   success: true,
+      //   userID: user._id,
+      //   username: user.username,
+      //   casts: user.casts,
+      //   accessToken: user.accessToken
+      // }))
       res.json({
         success: true,
         userID: user._id,
         username: user.username,
-        cast: user.casts[0],
+        casts: user.casts,
         accessToken: user.accessToken
       });
+      
     } else {
       res.status(404).json({ success: false, message: "User not found" });
     }

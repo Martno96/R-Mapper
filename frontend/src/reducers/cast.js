@@ -4,72 +4,51 @@ import { API_URL } from '../reusables/urls'
 import { nanoid } from 'nanoid'
 import * as joint from 'jointjs'
 
-import { getCredentials } from './user'
+import { getCredentials, getCasts } from './user'
 import { updatedGraph, graphSnapshot } from '../components/CastGraph'
 
 let initGraph = new joint.dia.Graph({}, { cellNamespace: joint.shapes })
 let jsonGraph = initGraph.toJSON(initGraph)
 
-const initialItems = {
-  graph: JSON.stringify(jsonGraph),
-  characters: [],
-  bonds: [],
-  first: 0
-}
 
-//OLD STARTING VALUES
-// {
-//   graph: JSON.stringify(jsonGraph),
-//   characters: [
-//     {
-//       id: "oy4jF4qTIzpHvEWS6xbk4",
-//       name: "Smirgus",
-//       bio: "sabka jcbskbqkib bdkabsd sabkdbka dbkasbjkdb kdbajsbd"
-//     },
-//     {
-//       id: "_Cdw9IYAXc-41miSlO5Xr",
-//       name: "Virp",
-//       bio: "olbdkabsd sabkdbka sabka jcbskbqkib dbkasbjkdb kdbajsbd"
-//     },
-//     {
-//       id: "PUX_muVoY4tHA2Dy-0gOX",
-//       name: "Plonky",
-//       bio: "sabka dbkasbjkdb jcbskbqkib sabkdbka kdbajsbd bdkabsd "
-//     }
-//   ],
-//   bonds: [
-//     {
-//       id: nanoid(),
-//       category: "Social Conflicts",
-//       source: "Plonky",
-//       subtype: "wants to be respected by",
-//       target: "Smirgus",
-//       summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
-//     },
-//     {
-//       id: nanoid(),
-//       category: "Formal Bonds",
-//       source: "Smirgus",
-//       subtype: "polices",
-//       target: "Virp",
-//       summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
-//     },
-//     {
-//       id: nanoid(),
-//       category: "Social Conflicts",
-//       source: "Virp",
-//       subtype: "seeks approval from",
-//       target: "Plonky",
-//       summary: "sabka sabkdbka dbkasbjkdb kdbajsbd"
-//     }
-//   ],
-//   first: 0
-// }
+//TO-DO: [_] is a try/catch block safer?
+const initialItems = localStorage.getItem("cast")
+  ? { 
+    ...JSON.parse(localStorage.getItem("cast")),
+    first: 0
+  }
+  : {
+    castId: "",
+    graph: JSON.stringify(jsonGraph),
+    characters: [],
+    bonds: [],
+    first: 0
+  }
+
+  
 
 export const cast = createSlice ({
   name: "cast",
   initialState: initialItems,
   reducers: {
+    //TO-DO: [_] Add middle-ware that batch dispatches this after other dispatches?
+      //Pros: 
+      //  allows me to not repeat myself with localStorage update
+      //Cons: 
+      //  middle-ware OR NOT: setting localStorage in a reducer AT ALL contradicts "reducers should be pure and have no side-effects"
+      //  requires writing of a switch in the middleware to determine which reducer?
+      //    or maybe just having a callback arg could work? or is that a scoping issue?   
+    setLocalStorage: (store, action) => {
+      localStorage.setItem("cast", JSON.stringify({ 
+        castId: store.castId,
+        graph: store.graph, //WARNING: this is the last SAVED graph, not the live one in paper (won't reflect new Element positions!)
+        characters: store.characters,
+        bonds: store.bonds
+      }))
+    },
+    setCastId: (store, action) => {
+      store.castId = action.payload[0]
+    },
     addCharacter: (store, action) => {
       store.characters = [...store.characters, {
         id: nanoid(),
@@ -92,14 +71,14 @@ export const cast = createSlice ({
       store.characters = [...charactersWithoutRemovedCharacter]
     },
     addBond: (store, action) => {
+      
       //validation of input
       if (
         typeof action.payload.category === 'string' && action.payload.category !== '' &&
         typeof action.payload.source === 'string' && action.payload.source !== '' &&
         typeof action.payload.subtype === 'string' && action.payload.subtype !== '' &&
         typeof action.payload.target === 'string' && action.payload.target !== '' &&
-        typeof action.payload.category === 'string' && action.payload.category !== '' &&
-        typeof action.payload.details === 'string' && action.payload.details !== ''
+        typeof action.payload.category === 'string' && action.payload.category !== ''
       ) {
         store.bonds = [...store.bonds, {
           id: nanoid(),
@@ -118,8 +97,15 @@ export const cast = createSlice ({
       store.bonds = updatedBonds
     },
     loadCast: (store, action) => {
-      updatedGraph.fromJSON(JSON.parse(JSON.parse(action.payload.graph)))
-      store.graph = action.payload.graph
+      let parsedGraph = action.payload.graph
+      
+      while (typeof parsedGraph === 'string') { //dangerous, since what if an error occurrs because we CANNOT parse?!
+        parsedGraph = JSON.parse(parsedGraph)
+      } //how do I do smart error handling here?
+      parsedGraph = JSON.stringify(parsedGraph)
+
+      updatedGraph.fromJSON(JSON.parse(parsedGraph)) //despite its name, the fromJSON() method does not want a JSON object string, but an object
+      store.graph = JSON.stringify(parsedGraph)
       store.characters = action.payload.characters
       store.bonds = action.payload.bonds
     },
@@ -136,30 +122,38 @@ export const cast = createSlice ({
         }
       })
 
-      //remove unwanted Characters from graph
+      console.log(elementPositionsToRetain)
+
+      //removing unwanted Characters from graph
       action.payload.model.getElements().forEach(characterElement => {
         if (store.characters.find(character => character.name === characterElement.attributes.attrs.label.text) === undefined) {
           characterElement.remove()
         }
       })
 
-      //remove unwanted Bonds from graph
+      //removing unwanted Bonds from graph
       action.payload.model.getLinks().forEach(bondLink => {
         if (store.bonds.find(bond => bond.id === bondLink.bondId) === undefined) {
           bondLink.remove()
         }
       })
 
-      //draw Characters
+      //drawing the Characters
       store.characters.forEach((character, index) => {
         let positionX, positionY
         if (elementPositionsToRetain.find(element => element.name === character.name) !== undefined) {
           //(now redundant, but can't risk refactoring last minute!)
+          
           //element is already in graph since previously
+          console.log("found previously existing character to retain!")
+
+          //ISSUE: these lines of code are redundant cuz the variables aren't actually USED if we AREN'T creating new
           positionX = elementPositionsToRetain.find(element => element.name === character.name).position.x
           positionY = elementPositionsToRetain.find(element => element.name === character.name).position.y
+        
         } else {
           //character is new and should be added to graph
+          console.log("found new character!")
           positionX = index*100
           positionY = index*100
           let characterElement = new joint.shapes.standard.Ellipse()
@@ -170,14 +164,14 @@ export const cast = createSlice ({
               fill: '#3f51b5',
               refRx: '60%',
               refRy: '100%',
-              cursor: 'default',
+              cursor: 'pointer',
               visibility: 'visible'
             },
             label: {
               text: character.name,
               fill: 'white',
               fontSize: 16,
-              cursor: 'default',
+              cursor: 'pointer',
               pointerEvents: 'none',
               visibility: 'visible',
             }
@@ -293,16 +287,27 @@ export const cast = createSlice ({
       })
       store.graph = JSON.stringify(action.payload.model.toJSON())
     },
-    clearFirst: (store, action) => {
+    clearFirst: (store) => {
       store.first++
+    },
+    exitCast: (store) => {
+      console.log("cast reducer exitCast running!")
+      store.graph = ""
+      store.castId = ""
+      store.first = 0
+      store.characters = []
+      store.bonds = []
     }
   }
 })
+
+//TO-DO: [_] (EDIT: SEE TOP OF REDUCER LIST) middle-ware for dispatching + also local storage??
 
 export const saveAndLoad = (userAction) => {
 
   return (dispatch, getState) => {
     const credentials = getCredentials(getState)
+    //const casts = getCasts(getState)
     const state = getState()
     let options
     switch (userAction) {
@@ -326,7 +331,7 @@ export const saveAndLoad = (userAction) => {
         }
         break
     }
-    fetch(API_URL(`users/${credentials.username}`), options)
+    fetch(API_URL(`casts/${state.cast.castId}`), options)
       .then(res => {
         return res.json()
       })
@@ -336,7 +341,7 @@ export const saveAndLoad = (userAction) => {
             dispatch(cast.actions.loadCast(data))
           })
         } else if (data.success && userAction === 'save') {
-          //save notification?
+          //TO-DO: [_] add save notification?
         } else {
           // dispatch(cast.actions.setError(data))
         }

@@ -5,14 +5,15 @@ import CredentialsForm from '../components/CredentialsForm.js'
 
 const Login = () => {
   const accessToken = useSelector(store => store.user.accessToken)
+  const casts = useSelector(store => store.user.casts)
   const history = useHistory()
   const error = useSelector(store => store.user.error)
 
   useEffect(() => {
-    if (accessToken) {
-      history.push('/users/:username')
+    if (accessToken && casts && casts.length > 0) {
+      history.push('/casts/:castId')
     }
-  }, [accessToken, history])
+  }, [accessToken, history, casts])
 
   return (
     <>
@@ -24,7 +25,7 @@ const Login = () => {
       <p>or if you are new here:</p>
       <h3>Sign Up</h3>
       <CredentialsForm formFunction='signup' />
-      {error !== null && (error.message === 'User not found') &&
+      {error && (error.message === 'User not found') &&
         <div>
           <p>The username/password combination was not found. </p>
           <p>Please try again, or sign up if you don't have an account</p>

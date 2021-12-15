@@ -6,16 +6,20 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
 import { Add } from '@material-ui/icons'
 import { useSelector, useDispatch } from 'react-redux'
 
 import cast from '../reducers/cast'
 
-export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
+export const NewCharacterForm = ({ newCharacterName, open, handleClose, onSuccess }) => {
 
   const characters = useSelector(store => store.cast.characters)
   const [name, setName] = useState(newCharacterName ? newCharacterName : '')
   const [bio, setBio] = useState("")
+  const [errorSnack, setErrorSnack] = useState(false)
+
   const dispatch = useDispatch()
 
   const onNameChange = (event) => {
@@ -26,11 +30,25 @@ export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
     setBio(event.target.value)
   }
 
-  const handleSubmit = () => {
-    dispatch(cast.actions.addCharacter({name, bio}))
-    setName("")
-    setBio("")
-    handleClose();
+  const handleErrorSnackClose = (event) => {
+    setErrorSnack(false)
+  }
+
+
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    console.log(characters)
+    console.log(`name: ${name}`)
+    if (characters.find(character => character.name === name) === undefined) {
+      onSuccess()
+      dispatch(cast.actions.addCharacter({name, bio}))
+      setName("")
+      setBio("")
+      handleClose();
+    } else {
+      setErrorSnack(true)
+    }
   };
 
   return (
@@ -68,6 +86,11 @@ export const NewCharacterForm = ({ newCharacterName, open, handleClose }) => {
             ADD
           </Button>
         </DialogActions>
+        <Snackbar open={errorSnack} autoHideDuration={6000} onClose={handleErrorSnackClose}>
+          <MuiAlert onClose={handleErrorSnackClose} severity="error">
+            That name is already in use by another character in this cast! Please choose another.
+          </MuiAlert>
+        </Snackbar>
       </Dialog>
     </div>
   );

@@ -10,6 +10,8 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
 import { Add } from '@material-ui/icons'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -34,8 +36,13 @@ export const NewBondForm = ({ open, handleClose }) => {
   const [subtype, setSubtype] = useState("")
   const [category, setCategory] = useState("")
   const [details, setDetails] = useState("")
+  const [errorSnack, setErrorSnack] = useState(false)
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  const handleErrorSnackClose = (event) => {
+    setErrorSnack(false)
+  }
 
   const handleSourceChange = (event) => {
     setSource(event.target.value)
@@ -59,14 +66,18 @@ export const NewBondForm = ({ open, handleClose }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    dispatch(cast.actions.addBond({source, target, details, subtype, category}))
-    setSource("")
-    setTarget("")
-    setDetails("")
-    setSubtype("")
-    setCategory("")
-    handleClose()
-  };
+    if (source !== target) {
+      dispatch(cast.actions.addBond({source, target, details, subtype, category}))
+      setSource("")
+      setTarget("")
+      setDetails("")
+      setSubtype("")
+      setCategory("")
+      handleClose()
+    } else {
+      setErrorSnack(true)
+    }
+  }
 
   return (
     <div>
@@ -159,6 +170,11 @@ export const NewBondForm = ({ open, handleClose }) => {
             ADD
           </Button>
         </DialogActions>
+        <Snackbar open={errorSnack} autoHideDuration={6000} onClose={handleErrorSnackClose}>
+          <MuiAlert onClose={handleErrorSnackClose} severity="error">
+            A character can't have a bond with themself!
+          </MuiAlert>
+        </Snackbar>
       </Dialog>
     </div>
   )

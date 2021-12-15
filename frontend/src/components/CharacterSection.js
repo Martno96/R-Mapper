@@ -34,7 +34,9 @@ const CharacterSection = () => {
       </Box>
       <Container maxWidth='sm'>
         {characters.map((character) => {
-        return <Character key={character.name} character={character}/>
+          return (
+            <Character key={character.name} character={character}/> 
+          )
         })}
       </Container>
     </section>
